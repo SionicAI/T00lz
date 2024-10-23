@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pomodoro Timer con Lista de Tareas</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #ff6347;
+            --secondary-color: #ffd700;
+            --background-color: #f5e6d3;
+            --text-color: #333;
+            --container-bg: #ffffff;
+            --task-bg: #f9f9f9;
+            --task-item-bg: #ffffff;
+            --button-text: #ffffff;
+        }
+
+        .dark-mode {
+            --primary-color: #ff7f50;
+            --secondary-color: #ffd700;
+            --background-color: #1a1a1a;
+            --text-color: #f0f0f0;
+            --container-bg: #2c2c2c;
+            --task-bg: #3a3a3a;
+            --task-item-bg: #2c2c2c;
+            --button-text: #1a1a1a;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .container {
+            background-color: var(--container-bg);
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+            transition: background-color 0.3s;
+        }
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            font-size: 2rem;
+        }
+        #timer {
+            font-size: 3.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            transition: color 0.3s ease;
+        }
+        .buttons {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+        }
+        button {
+            background-color: var(--primary-color);
+            color: var(--button-text);
+            border: none;
+            padding: 0.75rem 1rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.1s;
+            font-size: 0.9rem;
+            font-weight: 500;
+            flex: 1;
+            min-width: 100px;
+            max-width: 150px;
+        }
+        button:hover {
+            background-color: #ff7f50;
+            transform: translateY(-2px);
+        }
+        button:active {
+            transform: translateY(0);
+        }
+        #taskList {
+            text-align: left;
+            background-color: var(--task-bg);
+            padding: 1.5rem;
+            border-radius: 10px;
+            transition: background-color 0.3s;
+        }
+        #newTask {
+            width: calc(100% - 110px);
+            padding: 0.75rem;
+            border: 2px solid #ddd;
+            border-radius: 50px;
+            font-size: 1rem;
+            transition: border-color 0.3s, background-color 0.3s, color 0.3s;
+            margin-bottom: 0.5rem;
+            background-color: var(--task-item-bg);
+            color: var(--text-color);
+        }
+        #newTask:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+        #addTaskBtn {
+            width: 100px;
+            margin-left: 5px;
+        }
+        .task {
+            display: flex;
+            align-items: center;
+            margin-top: 1rem;
+            background-color: var(--task-item-bg);
+            padding: 0.75rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s, background-color 0.3s;
+        }
+        .task:hover {
+            transform: translateY(-2px);
+        }
+        .task input[type="checkbox"] {
+            margin-right: 1rem;
+            width: 20px;
+            height: 20px;
+        }
+        .completed {
+            text-decoration: line-through;
+            color: #888;
+        }
+        #modeIndicator {
+            font-size: 1.2rem;
+            font-weight: 500;
+            margin-bottom: 1rem;
+            color: var(--secondary-color);
+        }
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background-color: var(--task-bg);
+            border-radius: 5px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+        .progress {
+            width: 0%;
+            height: 100%;
+            background-color: var(--primary-color);
+            transition: width 1s linear;
+        }
+        #darkModeToggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: var(--task-bg);
+            color: var(--text-color);
+            border: none;
+            padding: 10px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+            .container {
+                padding: 1rem;
+            }
+            h1 {
+                font-size: 1.5rem;
+            }
+            #timer {
+                font-size: 3rem;
+            }
+            button {
+                padding: 0.6rem 0.8rem;
+                font-size: 0.8rem;
+                min-width: 80px;
+            }
+            #newTask {
+                width: calc(100% - 90px);
+                padding: 0.6rem;
+            }
+            #addTaskBtn {
+                width: 80px;
+            }
+            #darkModeToggle {
+                top: 10px;
+                right: 10px;
+                padding: 8px;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button id="darkModeToggle">🌓</button>
+    <div class="container">
+        <h1>Pomodoro Timer</h1>
+        <div id="modeIndicator">Modo: Trabajo</div>
+        <div id="timer">25:00</div>
+        <div class="progress-bar">
+            <div class="progress" id="progressBar"></div>
+        </div>
+        <div class="buttons">
+            <button id="startBtn">Iniciar</button>
+            <button id="pauseBtn">Pausar</button>
+            <button id="resetBtn">Reiniciar</button>
+        </div>
+        <div id="taskList">
+            <h2>Lista de Tareas</h2>
+            <input type="text" id="newTask" placeholder="Agregar nueva tarea">
+            <button id="addTaskBtn">Agregar</button>
+            <div id="tasks"></div>
+        </div>
+    </div>
+
+    <script>
+        let timer;
+        let timeLeft = 1500; // 25 minutos en segundos
+        let isRunning = false;
+        let pomodoroCount = 0;
+        let isBreak = false;
+        let totalTime = 1500;
+
+        const timerDisplay = document.getElementById('timer');
+        const startBtn = document.getElementById('startBtn');
+        const pauseBtn = document.getElementById('pauseBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const newTaskInput = document.getElementById('newTask');
+        const addTaskBtn = document.getElementById('addTaskBtn');
+        const tasksContainer = document.getElementById('tasks');
+        const modeIndicator = document.getElementById('modeIndicator');
+        const progressBar = document.getElementById('progressBar');
+        const darkModeToggle = document.getElementById('darkModeToggle');
+
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            updateProgressBar();
+        }
+
+        function updateProgressBar() {
+            const progress = ((totalTime - timeLeft) / totalTime) * 100;
+            progressBar.style.width = `${progress}%`;
+        }
+
+        function startTimer() {
+            if (!isRunning) {
+                isRunning = true;
+                startBtn.textContent = 'Pausar';
+                pauseBtn.style.display = 'none';
+                timer = setInterval(() => {
+                    timeLeft--;
+                    updateTimerDisplay();
+                    if (timeLeft === 0) {
+                        clearInterval(timer);
+                        isRunning = false;
+                        playNotification();
+                        if (!isBreak) {
+                            pomodoroCount++;
+                            if (pomodoroCount % 4 === 0) {
+                                timeLeft = 900; // 15 minutos de descanso largo
+                                totalTime = 900;
+                                modeIndicator.textContent = 'Modo: Descanso Largo';
+                            } else {
+                                timeLeft = 300; // 5 minutos de descanso corto
+                                totalTime = 300;
+                                modeIndicator.textContent = 'Modo: Descanso Corto';
+                            }
+                            isBreak = true;
+                        } else {
+                            timeLeft = 1500; // 25 minutos de trabajo
+                            totalTime = 1500;
+                            isBreak = false;
+                            modeIndicator.textContent = 'Modo: Trabajo';
+                        }
+                        updateTimerDisplay();
+                        startBtn.textContent = 'Iniciar';
+                        pauseBtn.style.display = 'inline-block';
+                    }
+                }, 1000);
+            } else {
+                pauseTimer();
+            }
+        }
+
+        function pauseTimer() {
+            clearInterval(timer);
+            isRunning = false;
+            startBtn.textContent = 'Reanudar';
+            pauseBtn.style.display = 'inline-block';
+        }
+
+        function resetTimer() {
+            clearInterval(timer);
+            isRunning = false;
+            timeLeft = 1500;
+            totalTime = 1500;
+            pomodoroCount = 0;
+            isBreak = false;
+            modeIndicator.textContent = 'Modo: Trabajo';
+            updateTimerDisplay();
+            startBtn.textContent = 'Iniciar';
+            pauseBtn.style.display = 'inline-block';
+        }
+
+        function playNotification() {
+            const audio = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-alarm-digital-clock-beep-989.mp3');
+            audio.play();
+        }
+
+        function addTask() {
+            const taskText = newTaskInput.value.trim();
+            if (taskText) {
+                const taskElement = document.createElement('div');
+                taskElement.className = 'task';
+                taskElement.innerHTML = `
+                    <input type="checkbox">
+                    <span>${taskText}</span>
+                `;
+                tasksContainer.appendChild(taskElement);
+                newTaskInput.value = '';
+
+                const checkbox = taskElement.querySelector('input[type="checkbox"]');
+                checkbox.addEventListener('change', () => {
+                    taskElement.querySelector('span').classList.toggle('completed');
+                });
+            }
+        }
+
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            darkModeToggle.textContent = document.body.classList.contains('dark-mode') ? '☀️' : '🌓';
+        }
+
+        startBtn.addEventListener('click', startTimer);
+        pauseBtn.addEventListener('click', pauseTimer);
+        resetBtn.addEventListener('click', resetTimer);
+        addTaskBtn.addEventListener('click', addTask);
+        newTaskInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                addTask();
+            }
+        });
+        darkModeToggle.addEventListener('click', toggleDarkMode);
+
+        updateTimerDisplay();
+    </script>
+</body>
+</html>
