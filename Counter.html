@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>SI0NI COUNTER</title>
+    <!-- Importar las fuentes Orbitron y Lato de Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;600;700&family=Orbitron:wght@700&display=swap" rel="stylesheet">
+    <style>
+        /* Variables de Color */
+        :root {
+            --bg-color: #f0ffff; /* Modo Claro */
+            --text-color: #414756;
+            --input-bg: rgba(255, 255, 255, 0.1);
+            --border-color: rgba(255, 255, 255, 0.3);
+            --button-bg: #ff00ff;
+            --button-text: #ffffff;
+            --error-color: #ff4d4d;
+            --switch-bg: #ccc;
+            --switch-knob: #ffffff;
+            --switch-checked-bg: #00ffff;
+            --neon-pink: #ff00ff;
+            --neon-blue: #00ffff;
+            --neon-purple: #a020f0;
+        }
+
+        body.dark {
+            --bg-color: #141414; /* Modo Oscuro */
+            --text-color: #ffffff;
+            --input-bg: rgba(0, 0, 0, 0.7);
+            --border-color: rgba(255, 255, 255, 0.2);
+            --button-bg: #00ffff;
+            --button-text: #141414;
+            --error-color: #ff4d4d;
+            --switch-bg: #555;
+            --switch-knob: #ffffff;
+            --switch-checked-bg: #ff00ff;
+            --neon-pink: #ff00ff;
+            --neon-blue: #00ffff;
+            --neon-purple: #a020f0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Lato', sans-serif;
+            margin: 0;
+            padding: 20px;
+            transition: background-color 0.5s, color 0.5s;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 2.5em;
+            text-shadow: 0 0 10px var(--neon-pink), 0 0 20px var(--neon-pink);
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 100px auto 0 auto; /* Ajustar margen superior para el switch fijo */
+            padding: 30px;
+            background: linear-gradient(135deg, rgba(255,0,255,0.1), rgba(0,255,255,0.1));
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(255, 0, 255, 0.2), 0 0 20px rgba(0, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-color);
+            transition: background 0.5s, box-shadow 0.5s, border-color 0.5s;
+            position: relative;
+        }
+
+        /* Reubicación del Theme Toggle dentro del Contenedor */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            align-items: center;
+            font-weight: 600;
+            font-size: 1em;
+            color: var(--text-color);
+            text-shadow: 0 0 5px var(--neon-blue);
+        }
+
+        .theme-toggle span {
+            margin-right: 8px;
+            transition: color 0.5s, text-shadow 0.5s;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+            margin-left: 10px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--switch-bg);
+            transition: 0.4s;
+            border-radius: 34px;
+            box-shadow: 0 0 5px var(--switch-bg);
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: var(--switch-knob);
+            transition: 0.4s;
+            border-radius: 50%;
+            box-shadow: 0 0 5px var(--switch-knob);
+        }
+
+        input:checked + .slider {
+            background-color: var(--switch-checked-bg);
+            box-shadow: 0 0 10px var(--switch-checked-bg);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        .field-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 1.1em;
+            text-shadow: 0 0 5px var(--neon-purple);
+        }
+
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--input-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-color);
+            resize: vertical;
+            box-sizing: border-box;
+            transition: border-color 0.3s, background-color 0.3s, color 0.3s;
+            font-family: 'Lato', sans-serif;
+            font-size: 1em;
+            font-weight: 400;
+            text-shadow: 0 0 3px var(--neon-blue);
+        }
+
+        input[type="text"]:focus, textarea:focus {
+            border-color: var(--neon-pink);
+            outline: none;
+            box-shadow: 0 0 10px var(--neon-pink);
+        }
+
+        textarea {
+            height: 100px;
+        }
+
+        .counter {
+            text-align: right;
+            margin-top: 5px;
+            font-size: 0.9em;
+            color: var(--text-color);
+            font-weight: 400;
+            text-shadow: 0 0 3px var(--neon-blue);
+        }
+
+        .counter.error {
+            color: var(--error-color);
+            text-shadow: 0 0 5px var(--error-color);
+        }
+
+        .buttons {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .buttons button {
+            background-color: var(--button-bg);
+            color: var(--button-text);
+            border: none;
+            padding: 12px 25px;
+            margin: 0 10px;
+            cursor: pointer;
+            border-radius: 8px;
+            font-size: 1em;
+            font-family: 'Lato', sans-serif;
+            font-weight: 600;
+            transition: background-color 0.3s, box-shadow 0.3s;
+            box-shadow: 0 0 10px var(--button-bg), 0 0 20px var(--button-bg);
+        }
+
+        .buttons button:hover {
+            background-color: var(--neon-pink);
+            box-shadow: 0 0 15px var(--neon-pink), 0 0 25px var(--neon-pink);
+        }
+
+        /* Efecto de Neón en Contenedores de Entrada */
+        .field-group input[type="text"], .field-group textarea {
+            box-shadow: 0 0 5px var(--neon-blue), 0 0 10px var(--neon-blue);
+        }
+
+        /* Responsividad */
+        @media (max-width: 600px) {
+            .theme-toggle {
+                position: static;
+                margin-bottom: 20px;
+            }
+
+            .container {
+                margin: 150px 10px 0 10px; /* Ajustar margen para pantallas pequeñas */
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+
+            .buttons button {
+                padding: 10px 20px;
+                margin: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Theme Toggle Ahora Dentro del Contenedor -->
+        <div class="theme-toggle">
+            <span id="theme-text">Modo Oscuro</span>
+            <label class="switch">
+                <input type="checkbox" id="theme-switch">
+                <span class="slider"></span>
+            </label>
+        </div>
+
+        <h1>SI0NI COUNTER</h1>
+
+        <!-- Título -->
+        <div class="field-group">
+            <label for="titulo">Título (50 caracteres)</label>
+            <input type="text" id="titulo" maxlength="100" placeholder="Escribe aquí...">
+            <div class="counter" id="titulo-counter">0 / 50</div>
+        </div>
+
+        <!-- Subtítulo -->
+        <div class="field-group">
+            <label for="subtitulo">Subtítulo (120 caracteres)</label>
+            <input type="text" id="subtitulo" maxlength="200" placeholder="Escribe aquí...">
+            <div class="counter" id="subtitulo-counter">0 / 120</div>
+        </div>
+
+        <!-- Sección -->
+        <div class="field-group">
+            <label for="seccion">Sección (300 caracteres)</label>
+            <textarea id="seccion" maxlength="1000" placeholder="Escribe aquí..."></textarea>
+            <div class="counter" id="seccion-counter">0 / 300</div>
+        </div>
+
+        <!-- Sección Ampliada -->
+        <div class="field-group">
+            <label for="seccion-ampliada">Sección ampliada (500 caracteres)</label>
+            <textarea id="seccion-ampliada" maxlength="1000" placeholder="Escribe aquí..."></textarea>
+            <div class="counter" id="seccion-ampliada-counter">0 / 500</div>
+        </div>
+
+        <!-- CTA -->
+        <div class="field-group">
+            <label for="cta">CTA (30 caracteres)</label>
+            <input type="text" id="cta" maxlength="60" placeholder="Escribe aquí...">
+            <div class="counter" id="cta-counter">0 / 30</div>
+        </div>
+
+        <div class="buttons">
+            <button id="reset-button">Reset</button>
+        </div>
+    </div>
+
+    <script>
+        const fields = [
+            { id: 'titulo', limit: 50 },
+            { id: 'subtitulo', limit: 120 },
+            { id: 'seccion', limit: 300 },
+            { id: 'seccion-ampliada', limit: 500 },
+            { id: 'cta', limit: 30 }
+        ];
+
+        fields.forEach(field => {
+            const input = document.getElementById(field.id);
+            const counter = document.getElementById(`${field.id}-counter`);
+
+            input.addEventListener('input', () => {
+                const currentLength = input.value.length;
+                counter.textContent = `${currentLength} / ${field.limit}`;
+
+                if (currentLength > field.limit) {
+                    counter.classList.add('error');
+                } else {
+                    counter.classList.remove('error');
+                }
+            });
+        });
+
+        document.getElementById('reset-button').addEventListener('click', () => {
+            fields.forEach(field => {
+                const input = document.getElementById(field.id);
+                const counter = document.getElementById(`${field.id}-counter`);
+                input.value = '';
+                counter.textContent = `0 / ${field.limit}`;
+                counter.classList.remove('error');
+            });
+        });
+
+        // Theme Toggle Switch
+        const themeSwitch = document.getElementById('theme-switch');
+        const body = document.body;
+        const themeToggleLabel = document.getElementById('theme-text');
+
+        // Verificar preferencia de tema almacenada
+        if (localStorage.getItem('theme') === 'dark') {
+            body.classList.add('dark');
+            themeSwitch.checked = true;
+            themeToggleLabel.textContent = 'Modo Claro';
+        }
+
+        themeSwitch.addEventListener('change', () => {
+            body.classList.toggle('dark');
+            if (body.classList.contains('dark')) {
+                themeToggleLabel.textContent = 'Modo Claro';
+                localStorage.setItem('theme', 'dark');
+            } else {
+                themeToggleLabel.textContent = 'Modo Oscuro';
+                localStorage.setItem('theme', 'light');
+            }
+        });
+    </script>
+</body>
+</html>

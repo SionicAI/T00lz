@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acortador de Enlaces</title>
+    <!-- Google Fonts: Fira Code (monoespaciada) -->
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code&display=swap" rel="stylesheet">
+    <!-- Font Awesome para iconos (opcional) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Reset de márgenes y paddings */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Estilos generales del cuerpo */
+        body {
+            background-color: #f5f5f5;
+            color: #333333;
+            font-family: 'Fira Code', monospace;
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        /* Contenedor principal */
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background-color: #ffffff;
+            padding: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        /* Encabezado */
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+
+        header p {
+            font-size: 1.1em;
+            color: #7f8c8d;
+        }
+
+        /* Formulario de acortamiento */
+        .shortener-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .shortener-form input[type="url"] {
+            padding: 10px 15px;
+            font-size: 1em;
+            border: 1px solid #bdc3c7;
+            border-radius: 4px;
+        }
+
+        .shortener-form button {
+            padding: 10px 15px;
+            font-size: 1em;
+            background-color: #2980b9;
+            color: #ffffff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .shortener-form button:hover {
+            background-color: #1f6391;
+        }
+
+        /* Lista de enlaces acortados */
+        .short-links {
+            list-style-type: none;
+        }
+
+        .short-links li {
+            margin: 10px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+            background-color: #ecf0f1;
+            border-radius: 4px;
+        }
+
+        .short-links li a {
+            color: #2980b9;
+            text-decoration: none;
+            word-break: break-all;
+        }
+
+        .short-links li a:hover {
+            text-decoration: underline;
+        }
+
+        .short-links li button {
+            background-color: #e74c3c;
+            color: #ffffff;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .short-links li button:hover {
+            background-color: #c0392b;
+        }
+
+        /* Pie de página */
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 0.9em;
+            color: #95a5a6;
+        }
+
+        /* Responsividad */
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+
+            header h1 {
+                font-size: 2em;
+            }
+
+            .shortener-form input[type="url"],
+            .shortener-form button {
+                font-size: 1em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Acortador de Enlaces</h1>
+            <p>Ingresa una URL larga y obtén una versión más corta y fácil de compartir.</p>
+        </header>
+        <main>
+            <form class="shortener-form" id="shortener-form">
+                <input type="url" id="long-url" placeholder="Ingresa la URL larga aquí" required>
+                <button type="submit"><i class="fas fa-link"></i> Acortar Enlace</button>
+            </form>
+            <ul class="short-links" id="short-links">
+                <!-- Enlaces acortados aparecerán aquí -->
+            </ul>
+        </main>
+        <footer>
+            <p>&copy; 2024 Tu Nombre. Todos los derechos reservados.</p>
+        </footer>
+    </div>
+
+    <script>
+        // Función para generar un código aleatorio
+        function generarCodigo(length = 6) {
+            const caracteres = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            let codigo = '';
+            for (let i = 0; i < length; i++) {
+                codigo += caracteres.charAt(Math.floor(Math.random() * caracteres.length));
+            }
+            return codigo;
+        }
+
+        // Función para cargar enlaces desde LocalStorage
+        function cargarEnlaces() {
+            const enlaces = JSON.parse(localStorage.getItem('enlaces')) || [];
+            const lista = document.getElementById('short-links');
+            lista.innerHTML = '';
+
+            enlaces.forEach(enlace => {
+                const li = document.createElement('li');
+
+                const a = document.createElement('a');
+                a.href = window.location.origin + window.location.pathname + '#' + enlace.codigo;
+                a.textContent = a.href;
+                a.target = '_blank';
+
+                const btnEliminar = document.createElement('button');
+                btnEliminar.innerHTML = '<i class="fas fa-trash"></i>';
+                btnEliminar.onclick = () => eliminarEnlace(enlace.codigo);
+
+                li.appendChild(a);
+                li.appendChild(btnEliminar);
+                lista.appendChild(li);
+            });
+        }
+
+        // Función para eliminar un enlace
+        function eliminarEnlace(codigo) {
+            let enlaces = JSON.parse(localStorage.getItem('enlaces')) || [];
+            enlaces = enlaces.filter(enlace => enlace.codigo !== codigo);
+            localStorage.setItem('enlaces', JSON.stringify(enlaces));
+            cargarEnlaces();
+        }
+
+        // Función para manejar el formulario
+        document.getElementById('shortener-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const longUrl = document.getElementById('long-url').value.trim();
+            if (!longUrl) return;
+
+            // Validar la URL
+            try {
+                new URL(longUrl);
+            } catch (_) {
+                alert('Por favor, ingresa una URL válida.');
+                return;
+            }
+
+            const codigo = generarCodigo();
+            const enlace = { codigo, longUrl };
+
+            // Guardar en LocalStorage
+            const enlaces = JSON.parse(localStorage.getItem('enlaces')) || [];
+            enlaces.push(enlace);
+            localStorage.setItem('enlaces', JSON.stringify(enlaces));
+
+            // Limpiar el formulario
+            document.getElementById('shortener-form').reset();
+            cargarEnlaces();
+        });
+
+        // Función para manejar redirecciones
+        function manejarRedireccion() {
+            const hash = window.location.hash.substring(1);
+            if (!hash) return;
+
+            const enlaces = JSON.parse(localStorage.getItem('enlaces')) || [];
+            const enlace = enlaces.find(enlace => enlace.codigo === hash);
+            if (enlace) {
+                window.location.href = enlace.longUrl;
+            }
+        }
+
+        // Inicializar
+        cargarEnlaces();
+        manejarRedireccion();
+    </script>
+</body>
+</html>
