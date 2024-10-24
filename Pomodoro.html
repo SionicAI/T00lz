@@ -91,54 +91,7 @@
         button:active {
             transform: translateY(0);
         }
-        #taskList {
-            text-align: left;
-            background-color: var(--task-bg);
-            padding: 1.5rem;
-            border-radius: 10px;
-            transition: background-color 0.3s;
-        }
-        #newTask {
-            width: calc(100% - 110px);
-            padding: 0.75rem;
-            border: 2px solid #ddd;
-            border-radius: 50px;
-            font-size: 1rem;
-            transition: border-color 0.3s, background-color 0.3s, color 0.3s;
-            margin-bottom: 0.5rem;
-            background-color: var(--task-item-bg);
-            color: var(--text-color);
-        }
-        #newTask:focus {
-            outline: none;
-            border-color: var(--primary-color);
-        }
-        #addTaskBtn {
-            width: 100px;
-            margin-left: 5px;
-        }
-        .task {
-            display: flex;
-            align-items: center;
-            margin-top: 1rem;
-            background-color: var(--task-item-bg);
-            padding: 0.75rem;
-            border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            transition: transform 0.2s, background-color 0.3s;
-        }
-        .task:hover {
-            transform: translateY(-2px);
-        }
-        .task input[type="checkbox"] {
-            margin-right: 1rem;
-            width: 20px;
-            height: 20px;
-        }
-        .completed {
-            text-decoration: line-through;
-            color: #888;
-        }
+        
         #modeIndicator {
             font-size: 1.2rem;
             font-weight: 500;
@@ -220,12 +173,7 @@
             <button id="pauseBtn">Pausar</button>
             <button id="resetBtn">Reiniciar</button>
         </div>
-        <div id="taskList">
-            <h2>Lista de Tareas</h2>
-            <input type="text" id="newTask" placeholder="Agregar nueva tarea">
-            <button id="addTaskBtn">Agregar</button>
-            <div id="tasks"></div>
-        </div>
+        
     </div>
 
     <script>
@@ -324,24 +272,7 @@
             audio.play();
         }
 
-        function addTask() {
-            const taskText = newTaskInput.value.trim();
-            if (taskText) {
-                const taskElement = document.createElement('div');
-                taskElement.className = 'task';
-                taskElement.innerHTML = `
-                    <input type="checkbox">
-                    <span>${taskText}</span>
-                `;
-                tasksContainer.appendChild(taskElement);
-                newTaskInput.value = '';
-
-                const checkbox = taskElement.querySelector('input[type="checkbox"]');
-                checkbox.addEventListener('change', () => {
-                    taskElement.querySelector('span').classList.toggle('completed');
-                });
-            }
-        }
+    
 
         function toggleDarkMode() {
             document.body.classList.toggle('dark-mode');
