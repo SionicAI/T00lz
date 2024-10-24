@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Aplicación de Una Sola Página - Estilo iOS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        /* Restablecimiento básico */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        /* Estilos del cuerpo */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background-color: #f2f2f7;
+            color: #000;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        /* Modo oscuro */
+        body.dark-mode {
+            background-color: #000;
+            color: #fff;
+        }
+        /* Encabezado */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: #fff;
+            color: #000;
+            border-bottom: 1px solid #ccc;
+            position: relative;
+        }
+        body.dark-mode header {
+            background-color: #1c1c1e;
+            border-bottom: 1px solid #3a3a3c;
+        }
+        /* Menú Hamburguesa */
+        .hamburger {
+            cursor: pointer;
+            width: 30px;
+            height: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .hamburger div {
+            background-color: #000;
+            height: 3px;
+            width: 100%;
+            border-radius: 2px;
+        }
+        body.dark-mode .hamburger div {
+            background-color: #fff;
+        }
+        /* Botón de Modo Oscuro */
+        .dark-mode-button {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: inherit;
+            outline: none;
+        }
+        /* Menú de Navegación */
+        nav {
+            display: none;
+            flex-direction: column;
+            position: absolute;
+            top: 60px;
+            left: 20px;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            width: 200px;
+            z-index: 1000;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        body.dark-mode nav {
+            background-color: #1c1c1e;
+            border: 1px solid #3a3a3c;
+            box-shadow: 0 4px 6px rgba(255,255,255,0.1);
+        }
+        nav a {
+            padding: 15px;
+            text-decoration: none;
+            color: #000;
+            font-size: 17px;
+            border-bottom: 1px solid #ccc;
+        }
+        nav a:last-child {
+            border-bottom: none;
+        }
+        body.dark-mode nav a {
+            color: #fff;
+            border-bottom: 1px solid #3a3a3c;
+        }
+        nav a:hover {
+            background-color: #f2f2f7;
+        }
+        body.dark-mode nav a:hover {
+            background-color: #2c2c2e;
+        }
+        /* Contenido Principal */
+        main {
+            padding: 20px;
+        }
+        /* Títulos de Sección */
+        h2 {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        /* Secciones */
+        .section {
+            display: none;
+        }
+        /* Sección Activa */
+        .active {
+            display: block;
+        }
+        /* Selector de Límite */
+        .limit-selector {
+            margin-bottom: 20px;
+        }
+        .limit-selector select {
+            width: 100%;
+            padding: 10px;
+            font-size: 17px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            background-color: #fff;
+            color: #000;
+        }
+        body.dark-mode .limit-selector select {
+            background-color: #1c1c1e;
+            color: #fff;
+            border: 1px solid #3a3a3c;
+        }
+        /* Textarea */
+        textarea {
+            width: 100%;
+            height: 150px;
+            padding: 15px;
+            font-size: 17px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            background-color: #fff;
+            color: #000;
+            resize: none;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+            transition: border-color 0.2s, background-color 0.2s;
+        }
+        body.dark-mode textarea {
+            background-color: #1c1c1e;
+            color: #fff;
+            border: 1px solid #3a3a3c;
+            box-shadow: inset 0 1px 3px rgba(255,255,255,0.1);
+        }
+        /* Estilo cuando se excede el límite */
+        textarea.exceed-limit {
+            border-color: #ff3b30;
+            background-color: #ffecec;
+        }
+        body.dark-mode textarea.exceed-limit {
+            border-color: #ff453a;
+            background-color: #3b0000;
+        }
+        /* Mostrar Contador */
+        .counter {
+            margin-top: 10px;
+            font-size: 17px;
+            color: #8e8e93;
+        }
+        body.dark-mode .counter {
+            color: #8e8e93;
+        }
+        /* Alerta de Límite Superado */
+        .alert {
+            margin-top: 10px;
+            font-size: 17px;
+            color: #ff3b30;
+        }
+        body.dark-mode .alert {
+            color: #ff453a;
+        }
+        /* Botón Reset */
+        .reset-button {
+            margin-top: 20px;
+            padding: 15px;
+            font-size: 17px;
+            background-color: #007aff;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .reset-button:hover {
+            background-color: #0051a8;
+        }
+        /* Estilos de Calculadora */
+        .calculator-display {
+            width: 100%;
+            padding: 20px;
+            font-size: 48px;
+            text-align: right;
+            background-color: #fff;
+            color: #000;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+            word-wrap: break-word;
+            min-height: 80px;
+        }
+        body.dark-mode .calculator-display {
+            background-color: #1c1c1e;
+            color: #fff;
+            border: 1px solid #3a3a3c;
+            box-shadow: inset 0 1px 3px rgba(255,255,255,0.1);
+        }
+        .calculator-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .calculator-grid button {
+            padding: 20px;
+            font-size: 28px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            background-color: #e5e5ea;
+            color: #000;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: background-color 0.2s, box-shadow 0.2s;
+        }
+        .calculator-grid button:hover {
+            background-color: #d1d1d6;
+        }
+        /* Botones en modo oscuro */
+        body.dark-mode .calculator-grid button {
+            background-color: #333333;
+            color: #fff;
+            box-shadow: 0 2px 4px rgba(255,255,255,0.1);
+        }
+        body.dark-mode .calculator-grid button:hover {
+            background-color: #444444;
+        }
+        /* Botones de operadores */
+        .calculator-grid button.operator {
+            background-color: #ff9500;
+            color: #fff;
+        }
+        .calculator-grid button.operator:hover {
+            background-color: #d17b00;
+        }
+        body.dark-mode .calculator-grid button.operator {
+            background-color: #ff9f0a;
+        }
+        body.dark-mode .calculator-grid button.operator:hover {
+            background-color: #d87c00;
+        }
+        /* Botón Igual */
+        .calculator-grid button.equals {
+            background-color: #34c759;
+            color: #fff;
+        }
+        .calculator-grid button.equals:hover {
+            background-color: #28a745;
+        }
+        body.dark-mode .calculator-grid button.equals {
+            background-color: #30d158;
+        }
+        body.dark-mode .calculator-grid button.equals:hover {
+            background-color: #248f46;
+        }
+        /* Diseño Responsivo */
+        @media (max-width: 600px) {
+            nav {
+                width: calc(100% - 40px);
+                left: 20px;
+            }
+            header {
+                flex-direction: row;
+                align-items: center;
+                justify-content: space-between;
+            }
+            .dark-mode-button {
+                margin-top: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Encabezado con Menú Hamburguesa y Botón de Modo Oscuro -->
+    <header>
+        <div class="hamburger" onclick="toggleMenu()">
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+        <button class="dark-mode-button" onclick="toggleDarkMode()">🌙</button>
+    </header>
+    <!-- Menú de Navegación -->
+    <nav id="navMenu">
+        <a href="#" onclick="showSection('character-counter')">Contador de Caracteres</a>
+        <a href="#" onclick="showSection('calculator')">Calculadora</a>
+    </nav>
+    <!-- Contenido Principal -->
+    <main>
+        <!-- Sección de Contador de Caracteres -->
+        <section id="character-counter" class="section active">
+            <h2>Contador de Caracteres</h2>
+            <div class="limit-selector">
+                <select id="limitSelect" onchange="updateCount()">
+                    <option value="0">Sin límite</option>
+                    <option value="50">Título (50 caracteres)</option>
+                    <option value="120">Subtítulo (120 caracteres)</option>
+                    <option value="300">Sección (300 caracteres)</option>
+                    <option value="500">Sección ampliada (500 caracteres)</option>
+                    <option value="30">CTA (30 caracteres)</option>
+                </select>
+            </div>
+            <textarea id="textInput" oninput="updateCount()" placeholder="Escribe algo..."></textarea>
+            <div class="counter">Caracteres: <span id="charCount">0</span></div>
+            <div class="alert" id="charAlert" style="display: none;">¡Has superado el límite de caracteres!</div>
+            <button class="reset-button" onclick="resetText()">Resetear</button>
+        </section>
+        <!-- Sección de Calculadora -->
+        <section id="calculator" class="section">
+            <h2>Calculadora</h2>
+            <div class="calculator-display" id="calcDisplay">0</div>
+            <div class="calculator-grid">
+                <button onclick="clearDisplay()">AC</button>
+                <button onclick="pressKey('%')" class="operator">%</button>
+                <button onclick="pressKey('/')" class="operator">÷</button>
+                <button onclick="pressKey('*')" class="operator">×</button>
+                <button onclick="pressKey('7')">7</button>
+                <button onclick="pressKey('8')">8</button>
+                <button onclick="pressKey('9')">9</button>
+                <button onclick="pressKey('-')" class="operator">−</button>
+                <button onclick="pressKey('4')">4</button>
+                <button onclick="pressKey('5')">5</button>
+                <button onclick="pressKey('6')">6</button>
+                <button onclick="pressKey('+')" class="operator">+</button>
+                <button onclick="pressKey('1')">1</button>
+                <button onclick="pressKey('2')">2</button>
+                <button onclick="pressKey('3')">3</button>
+                <button onclick="calculate()" class="equals" style="grid-row: span 2;">=</button>
+                <button onclick="pressKey('0')" style="grid-column: span 2;">0</button>
+                <button onclick="pressKey('.')">.</button>
+            </div>
+        </section>
+    </main>
+    <!-- JavaScript -->
+    <script>
+        // Alternar Menú de Navegación
+        function toggleMenu() {
+            var navMenu = document.getElementById('navMenu');
+            if (navMenu.style.display === 'flex') {
+                navMenu.style.display = 'none';
+            } else {
+                navMenu.style.display = 'flex';
+            }
+        }
+        // Mostrar Sección Seleccionada
+        function showSection(sectionId) {
+            var sections = document.querySelectorAll('.section');
+            sections.forEach(function(section) {
+                section.classList.remove('active');
+            });
+            document.getElementById(sectionId).classList.add('active');
+            // Ocultar Menú Después de la Selección
+            document.getElementById('navMenu').style.display = 'none';
+        }
+        // Actualizar Contador de Caracteres
+        function updateCount() {
+            var textInput = document.getElementById('textInput');
+            var charCount = document.getElementById('charCount');
+            var limitSelect = document.getElementById('limitSelect');
+            var charAlert = document.getElementById('charAlert');
+
+            var currentLength = textInput.value.length;
+            var selectedLimit = parseInt(limitSelect.value);
+
+            if (selectedLimit > 0) {
+                charCount.textContent = currentLength + ' / ' + selectedLimit;
+            } else {
+                charCount.textContent = currentLength;
+            }
+
+            if (selectedLimit > 0 && currentLength > selectedLimit) {
+                charAlert.style.display = 'block';
+                textInput.classList.add('exceed-limit');
+            } else {
+                charAlert.style.display = 'none';
+                textInput.classList.remove('exceed-limit');
+            }
+        }
+        // Resetear Textarea
+        function resetText() {
+            var textInput = document.getElementById('textInput');
+            textInput.value = '';
+            textInput.classList.remove('exceed-limit');
+            updateCount();
+        }
+        // Funcionalidad de Calculadora
+        var calcExpression = '';
+        var calcDisplay = document.getElementById('calcDisplay');
+        function pressKey(key) {
+            var display = calcDisplay;
+            if (display.textContent === '0' || display.textContent === 'Error') {
+                calcExpression = '';
+            }
+            calcExpression += key;
+            display.textContent = calcExpression;
+        }
+        function calculate() {
+            var display = calcDisplay;
+            try {
+                // Reemplazar símbolos por operadores válidos
+                var expression = calcExpression.replace(/×/g, '*').replace(/−/g, '-').replace(/÷/g, '/').replace(/%/g, '/100');
+                var result = eval(expression);
+                display.textContent = result;
+                calcExpression = result.toString();
+            } catch (e) {
+                display.textContent = 'Error';
+                calcExpression = '';
+            }
+        }
+        function clearDisplay() {
+            calcExpression = '';
+            calcDisplay.textContent = '0';
+        }
+        // Alternar Modo Oscuro
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            var darkModeButton = document.querySelector('.dark-mode-button');
+            if (document.body.classList.contains('dark-mode')) {
+                darkModeButton.textContent = '☀️'; // Icono de sol
+            } else {
+                darkModeButton.textContent = '🌙'; // Icono de luna
+            }
+        }
+        // Establecer el ícono correcto al cargar la página
+        window.onload = function() {
+            var darkModeButton = document.querySelector('.dark-mode-button');
+            if (document.body.classList.contains('dark-mode')) {
+                darkModeButton.textContent = '☀️';
+            } else {
+                darkModeButton.textContent = '🌙';
+            }
+            // Inicializar contador
+            updateCount();
+        };
+        // Agregar soporte de teclado a la calculadora
+        document.addEventListener('keydown', function(event) {
+            // Solo si la sección de calculadora está activa
+            if (document.getElementById('calculator').classList.contains('active')) {
+                var key = event.key;
+                var allowedKeys = ['0','1','2','3','4','5','6','7','8','9','.','+','-','*','/','%','Enter','Backspace','Escape'];
+                if (allowedKeys.includes(key)) {
+                    event.preventDefault();
+                    if (key === 'Enter') {
+                        calculate();
+                    } else if (key === 'Backspace') {
+                        calcExpression = calcExpression.slice(0, -1);
+                        calcDisplay.textContent = calcExpression || '0';
+                    } else if (key === 'Escape') {
+                        clearDisplay();
+                    } else {
+                        pressKey(key);
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
