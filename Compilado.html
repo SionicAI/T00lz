@@ -428,9 +428,9 @@
             padding: 10px;
             font-size: 14px;
             border: none;
-            border-bottom: 1px solid #ccc;
+            border-bottom:  1px solid #ccc;
             background-color: transparent;
-            color:  inherit;
+            color: inherit;
             outline: none;
             resize: vertical;
             transition: border-color 0.3s;
@@ -459,6 +459,61 @@
         }
         body.dark-mode .todo-footer input[type="checkbox"] {
             accent-color: #f5f5f5;
+        }
+
+        /* Estilos para el Bloc de Notas */
+        #notepad {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        #notepad-content {
+            width: 100%;
+            min-height: 300px;
+            padding: 20px;
+            font-size: 18px;
+            line-height: 1.6;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            outline: none;
+            resize: vertical;
+            transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+        }
+        body.dark-mode #notepad-content {
+            background-color: #2c2c2e;
+            color: #fff;
+            border-color: #3a3a3c;
+        }
+        .notepad-toolbar {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .notepad-tools button {
+            background: none;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+            padding: 5px 10px;
+            margin-right: 10px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        body.dark-mode .notepad-tools button {
+            color: #fff;
+        }
+        .notepad-tools button:hover {
+            background-color: #f0f0f0;
+        }
+        body.dark-mode .notepad-tools button:hover {
+            background-color: #3a3a3c;
+        }
+        .word-count {
+            font-size: 14px;
+            color: #666;
+        }
+        body.dark-mode .word-count {
+            color: #999;
         }
 
         /* Estilos responsivos */
@@ -500,6 +555,16 @@
             .todo-footer label {
                 font-size: 12px;
             }
+            .notepad-toolbar {
+                flex-direction: column;
+                align-items: center;
+            }
+            .notepad-tools {
+                margin-bottom: 10px;
+            }
+            #notepad-content {
+                font-size: 16px;
+            }
         }
     </style>
 </head>
@@ -516,6 +581,7 @@
         <a href="#" onclick="showSection('character-counter')">Contador de Caracteres</a>
         <a href="#" onclick="showSection('calculator')">Calculadora</a>
         <a href="#" onclick="showSection('minimalistv2')">Minimalistv2</a>
+        <a href="#" onclick="showSection('notepad')">Bloc de Notas</a>
     </nav>
     <main>
         <section id="character-counter" class="section active">
@@ -592,6 +658,19 @@
                 <button class="reset-button" onclick="clearCompletedTasks()">🗑 Eliminar Completadas</button>
             </div>
         </section>
+        <section id="notepad" class="section">
+            <h2>Bloc de Notas</h2>
+            <div class="notepad-toolbar">
+                <div class="notepad-tools">
+                    <button onclick="applyStyle('bold')"><strong>B</strong></button>
+                    <button onclick="applyStyle('italic')"><em>I</em></button>
+                    <button onclick="applyStyle('underline')"><u>U</u></button>
+                    <button onclick="applyStyle('strikethrough')"><s>S</s></button>
+                </div>
+                <div class="word-count">Palabras: <span id="word-count">0</span></div>
+            </div>
+            <div contenteditable="true" id="notepad-content" oninput="updateWordCount()"></div>
+        </section>
     </main>
     <script>
         // Funciones generales
@@ -607,6 +686,9 @@
             });
             document.getElementById(sectionId).classList.add('active');
             document.getElementById('navMenu').style.display = 'none';
+            if (sectionId === 'notepad') {
+                updateWordCount();
+            }
         }
 
         function toggleDarkMode() {
@@ -757,97 +839,57 @@
         function renderTasks() {
             let taskList = document.getElementById('taskList');
             taskList.innerHTML = '';
-            let tasks = todoData[currentGroup]?.tasks || [];
-            tasks.forEach((task, index) => {
-                if (task.completed && !showCompleted) return;
-                let li = document.createElement('li');
-                li.className = 'todo-item';
-                li.innerHTML = `
-                    <input type="checkbox" ${task.completed ? 'checked' : ''} onchange="toggleTaskCompletion(${index})">
-                    <div class="priority-indicator" style="background-color: ${task.priority}"></div>
-                    <span class="todo-text ${task.completed ? 'completed' : ''}">${task.text}</span>
-                    <button class="edit-button" title="Editar Tarea" onclick="editTask(${index})">✎</button>
-                    <button class="comment-button" title="Comentario" onclick="toggleCommentSection(this.parentNode)">💬</button>
-                    <button class="delete-button" title="Eliminar Tarea" onclick="deleteTask(${index})">🗑</button>
-                    <div class="comment-section">
-                        <textarea oninput="updateTaskComment(${index}, this.value)">${task.comment}</textarea>
-                    </div>
-                `;
-                li.draggable = true;
-                li.ondragstart = (e) => { draggedTaskIndex = index; };
-                li.ondragover = (e) => e.preventDefault();
-                li.ondrop = (e) => drop(e, index);
-                taskList.appendChild(li);
+            todoData[currentGroup].tasks.forEach((task, index) => {
+                if (showCompleted || !task.completed) {
+                    let li = document.createElement('li');
+                    li.className = 'todo-item';
+                    li.innerHTML = `
+                        <input type="checkbox" ${task.completed ? 'checked' : ''} onchange="toggleTask(${index})">
+                        <div class="priority-indicator" style="background-color: ${task.priority};"></div>
+                        <span class="todo-text ${task.completed ? 'completed' : ''}">${task.text}</span>
+                        <button class="comment-button" onclick="toggleComment(${index})">💬</button>
+                        <button class="edit-button" onclick="editTask(${index})">✎</button>
+                        <button class="delete-button" onclick="deleteTask(${index})">🗑</button>
+                        <div class="comment-section" style="display: none;">
+                            <textarea placeholder="Añade un comentario...">${task.comment}</textarea>
+                        </div>
+                    `;
+                    taskList.appendChild(li);
+                }
             });
         }
 
-        function toggleTaskCompletion(index) {
+        function toggleTask(index) {
             todoData[currentGroup].tasks[index].completed = !todoData[currentGroup].tasks[index].completed;
             renderTasks();
             saveTodoData();
         }
 
-        function editTask(index) {
-            let task = todoData[currentGroup].tasks[index];
-            let newTaskText = prompt('Editar tarea:', task.text);
-            if (newTaskText !== null) {
-                task.text = newTaskText.trim() || task.text;
-            }
-            let priorityOptions = [
-                { color: '#e57373', name: 'rojo' },
-                { color: '#ffb74d', name: 'amarillo' },
-                { color: '#81c784', name: 'verde' },
-                { color: '#64b5f6', name: 'azul' },
-                { color: '#90a4ae', name: 'gris' }
-            ];
-            let prioritySelector = document.createElement('div');
-            prioritySelector.style.display = 'flex';
-            prioritySelector.style.justifyContent = 'center';
-            prioritySelector.style.marginTop = '10px';
-            priorityOptions.forEach(option => {
-                let colorOption = document.createElement('div');
-                colorOption.style.width = '20px';
-                colorOption.style.height = '20px';
-                colorOption.style.borderRadius = '50%';
-                colorOption.style.backgroundColor = option.color;
-                colorOption.style.margin = '0 5px';
-                colorOption.style.cursor = 'pointer';
-                if (option.color === task.priority) {
-                    colorOption.style.border = '2px solid #333';
-                }
-                colorOption.onclick = () => {
-                    task.priority = option.color;
-                    document.body.removeChild(prioritySelectorContainer);
-                    renderTasks();
-                    saveTodoData();
-                };
-                prioritySelector.appendChild(colorOption);
-            });
-            let prioritySelectorContainer = document.createElement('div');
-            prioritySelectorContainer.style.position = 'fixed';
-            prioritySelectorContainer.style.top = '0';
-            prioritySelectorContainer.style.left = '0';
-            prioritySelectorContainer.style.width = '100%';
-            prioritySelectorContainer.style.height = '100%';
-            prioritySelectorContainer.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
-            prioritySelectorContainer.style.display = 'flex';
-            prioritySelectorContainer.style.alignItems = 'center';
-            prioritySelectorContainer.style.justifyContent = 'center';
-            prioritySelectorContainer.appendChild(prioritySelector);
-            prioritySelectorContainer.onclick = () => {
-                document.body.removeChild(prioritySelectorContainer);
+        function toggleComment(index) {
+            let commentSection = document.querySelectorAll('.comment-section')[index];
+            commentSection.style.display = commentSection.style.display === 'none' ? 'block' : 'none';
+            let textarea = commentSection.querySelector('textarea');
+            textarea.oninput = () => {
+                todoData[currentGroup].tasks[index].comment = textarea.value;
+                saveTodoData();
             };
-            document.body.appendChild(prioritySelectorContainer);
         }
 
-        function toggleCommentSection(li) {
-            let commentSection = li.querySelector('.comment-section');
-            commentSection.style.display = commentSection.style.display === 'block' ? 'none' : 'block';
+        function editTask(index) {
+            let newText = prompt('Editar tarea:', todoData[currentGroup].tasks[index].text);
+            if (newText !== null) {
+                todoData[currentGroup].tasks[index].text = newText;
+                renderTasks();
+                saveTodoData();
+            }
         }
 
-        function updateTaskComment(index, comment) {
-            todoData[currentGroup].tasks[index].comment = comment;
-            saveTodoData();
+        function deleteTask(index) {
+            if (confirm('¿Estás seguro de que quieres eliminar esta tarea?')) {
+                todoData[currentGroup].tasks.splice(index, 1);
+                renderTasks();
+                saveTodoData();
+            }
         }
 
         function toggleCompletedTasks() {
@@ -861,46 +903,35 @@
             saveTodoData();
         }
 
-        function deleteTask(index) {
-            if (confirm('¿Deseas eliminar esta tarea?')) {
-                todoData[currentGroup].tasks.splice(index, 1);
-                renderTasks();
-                saveTodoData();
-            }
-        }
-
-        document.querySelectorAll('.priority-option').forEach(option => {
-            option.onclick = () => {
-                document.querySelectorAll('.priority-option').forEach(opt => opt.classList.remove('selected'));
-                option.classList.add('selected');
-                selectedPriorityColor = option.dataset.color;
-            };
-        });
-
         function saveTodoData() {
             localStorage.setItem('todoData', JSON.stringify(todoData));
             localStorage.setItem('currentGroup', currentGroup);
         }
 
-        let draggedTaskIndex;
+        document.querySelectorAll('.priority-option').forEach(option => {
+            option.addEventListener('click', function() {
+                document.querySelector('.priority-option.selected').classList.remove('selected');
+                this.classList.add('selected');
+                selectedPriorityColor = this.dataset.color;
+            });
+        });
 
-        function drop(e, targetIndex) {
-            e.preventDefault();
-            if (draggedTaskIndex !== targetIndex) {
-                let tasks = todoData[currentGroup].tasks;
-                let draggedTask = tasks[draggedTaskIndex];
-                tasks.splice(draggedTaskIndex, 1);
-                tasks.splice(targetIndex, 0, draggedTask);
-                renderTasks();
-                saveTodoData();
-            }
+        // Funciones para el Bloc de Notas
+        function applyStyle(style) {
+            document.execCommand(style, false, null);
+        }
+
+        function updateWordCount() {
+            const content = document.getElementById('notepad-content').innerText;
+            const wordCount = content.trim().split(/\s+/).filter(word => word !== '').length;
+            document.getElementById('word-count').textContent = wordCount;
         }
 
         // Inicialización
-        document.addEventListener('DOMContentLoaded', function() {
+        window.onload = function() {
             updateCount();
             initializeTodoList();
-        });
+        };
     </script>
 </body>
 </html>
