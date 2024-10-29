@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pomodoro Timer</title>
+    <title>Pomodoro Timer Mejorado</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -13,8 +13,10 @@
             --text-color: #333;
             --container-bg: #ffffff;
             --task-bg: #f9f9f9;
-            --task-item-bg: #ffffff;
             --button-text: #ffffff;
+            --mint-color: #98d7c2;
+            --mint-dark: #5a9b8c;
+            --mint-text: #2a5d4d;
         }
 
         .dark-mode {
@@ -24,8 +26,10 @@
             --text-color: #f0f0f0;
             --container-bg: #2c2c2c;
             --task-bg: #3a3a3a;
-            --task-item-bg: #2c2c2c;
             --button-text: #1a1a1a;
+            --mint-color: #3a7d6d;
+            --mint-dark: #2a5d4d;
+            --mint-text: #98d7c2;
         }
 
         body {
@@ -43,21 +47,21 @@
         }
         .container {
             background-color: var(--container-bg);
-            padding: 2rem;
+            padding: 1.5rem;
             border-radius: 20px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
             text-align: center;
-            max-width: 500px;
-            width: 100%;
-            transition: background-color 0.3s;
+            max-width: 100%;
+            width: 340px;
+            transition: background-color 0.3s, color 0.3s;
         }
         h1 {
             color: var(--primary-color);
             margin-bottom: 1rem;
-            font-size: 2rem;
+            font-size: 1.8rem;
         }
         #timer {
-            font-size: 3.5rem;
+            font-size: 3rem;
             font-weight: 700;
             color: var(--primary-color);
             margin-bottom: 1rem;
@@ -68,21 +72,21 @@
             justify-content: center;
             flex-wrap: wrap;
             gap: 0.5rem;
-            margin-bottom: 2rem;
+            margin-bottom: 1rem;
         }
         button {
             background-color: var(--primary-color);
             color: var(--button-text);
             border: none;
-            padding: 0.75rem 1rem;
+            padding: 0.6rem 0.8rem;
             border-radius: 50px;
             cursor: pointer;
             transition: background-color 0.3s, transform 0.1s;
             font-size: 0.9rem;
             font-weight: 500;
             flex: 1;
-            min-width: 100px;
-            max-width: 150px;
+            min-width: 80px;
+            max-width: 120px;
         }
         button:hover {
             background-color: #ff7f50;
@@ -92,17 +96,11 @@
             transform: translateY(0);
         }
         
-        #modeIndicator {
-            font-size: 1.2rem;
-            font-weight: 500;
-            margin-bottom: 1rem;
-            color: var(--secondary-color);
-        }
         .progress-bar {
             width: 100%;
-            height: 10px;
+            height: 8px;
             background-color: var(--task-bg);
-            border-radius: 5px;
+            border-radius: 4px;
             overflow: hidden;
             margin-bottom: 1rem;
         }
@@ -114,83 +112,70 @@
         }
         #darkModeToggle {
             position: absolute;
-            top: 20px;
-            right: 20px;
+            top: 10px;
+            right: 10px;
             background-color: var(--task-bg);
             color: var(--text-color);
             border: none;
-            padding: 10px;
+            padding: 8px;
             border-radius: 50%;
             cursor: pointer;
-            font-size: 1.2rem;
+            font-size: 1rem;
             transition: background-color 0.3s, color 0.3s;
         }
-        @media (max-width: 480px) {
-            body {
-                padding: 10px;
-            }
-            .container {
-                padding: 1rem;
-            }
-            h1 {
-                font-size: 1.5rem;
-            }
-            #timer {
-                font-size: 3rem;
-            }
-            button {
-                padding: 0.6rem 0.8rem;
-                font-size: 0.8rem;
-                min-width: 80px;
-            }
-            #newTask {
-                width: calc(100% - 90px);
-                padding: 0.6rem;
-            }
-            #addTaskBtn {
-                width: 80px;
-            }
-            #darkModeToggle {
-                top: 10px;
-                right: 10px;
-                padding: 8px;
-                font-size: 1rem;
-            }
+        #pomodoroType {
+            width: calc(100% - 16px);
+            padding: 0.6rem;
+            margin-bottom: 1rem;
+            border: 1px solid var(--task-bg);
+            border-radius: 4px;
+            font-size: 0.9rem;
+            background-color: var(--container-bg);
+            color: var(--text-color);
+        }
+        #pomodoroCount {
+            font-size: 0.9rem;
+            margin-top: 1rem;
+            color: var(--text-color);
         }
     </style>
 </head>
 <body>
-    <button id="darkModeToggle">🌓</button>
+    <button id="darkModeToggle">☼/☾</button>
     <div class="container">
         <h1>Pomodoro Timer</h1>
-        <div id="modeIndicator">Modo: Trabajo</div>
         <div id="timer">25:00</div>
         <div class="progress-bar">
             <div class="progress" id="progressBar"></div>
         </div>
+        <select id="pomodoroType">
+            <option value="1500">Trabajo (25 minutos)</option>
+            <option value="300">Descanso corto (5 minutos)</option>
+            <option value="900">Descanso largo (15 minutos)</option>
+        </select>
         <div class="buttons">
             <button id="startBtn">Iniciar</button>
-            <button id="pauseBtn">Pausar</button>
             <button id="resetBtn">Reiniciar</button>
         </div>
-        
+        <div id="pomodoroCount">Pomodoros completados: 0</div>
     </div>
 
     <script>
         let timer;
         let timeLeft = 1500; // 25 minutos en segundos
         let isRunning = false;
+        let totalTime = 1500;
         let pomodoroCount = 0;
         let isBreak = false;
-        let totalTime = 1500;
 
         const timerDisplay = document.getElementById('timer');
         const startBtn = document.getElementById('startBtn');
-        const pauseBtn = document.getElementById('pauseBtn');
         const resetBtn = document.getElementById('resetBtn');
-        const modeIndicator = document.getElementById('modeIndicator');
         const progressBar = document.getElementById('progressBar');
         const darkModeToggle = document.getElementById('darkModeToggle');
+        const pomodoroTypeSelect = document.getElementById('pomodoroType');
+        const pomodoroCountDisplay = document.getElementById('pomodoroCount');
+        const container = document.querySelector('.container');
 
         function updateTimerDisplay() {
             const minutes = Math.floor(timeLeft / 60);
@@ -208,7 +193,6 @@
             if (!isRunning) {
                 isRunning = true;
                 startBtn.textContent = 'Pausar';
-                pauseBtn.style.display = 'none';
                 timer = setInterval(() => {
                     timeLeft--;
                     updateTimerDisplay();
@@ -216,27 +200,18 @@
                         clearInterval(timer);
                         isRunning = false;
                         playNotification();
+                        startBtn.textContent = 'Iniciar';
                         if (!isBreak) {
                             pomodoroCount++;
+                            updatePomodoroCount();
                             if (pomodoroCount % 4 === 0) {
-                                timeLeft = 900; // 15 minutos de descanso largo
-                                totalTime = 900;
-                                modeIndicator.textContent = 'Modo: Descanso Largo';
+                                setNextPomodoro('900'); // Descanso largo
                             } else {
-                                timeLeft = 300; // 5 minutos de descanso corto
-                                totalTime = 300;
-                                modeIndicator.textContent = 'Modo: Descanso Corto';
+                                setNextPomodoro('300'); // Descanso corto
                             }
-                            isBreak = true;
                         } else {
-                            timeLeft = 1500; // 25 minutos de trabajo
-                            totalTime = 1500;
-                            isBreak = false;
-                            modeIndicator.textContent = 'Modo: Trabajo';
+                            setNextPomodoro('1500'); // Trabajo
                         }
-                        updateTimerDisplay();
-                        startBtn.textContent = 'Iniciar';
-                        pauseBtn.style.display = 'inline-block';
                     }
                 }, 1000);
             } else {
@@ -248,40 +223,60 @@
             clearInterval(timer);
             isRunning = false;
             startBtn.textContent = 'Reanudar';
-            pauseBtn.style.display = 'inline-block';
         }
 
         function resetTimer() {
             clearInterval(timer);
             isRunning = false;
-            timeLeft = 1500;
-            totalTime = 1500;
-            pomodoroCount = 0;
-            isBreak = false;
-            modeIndicator.textContent = 'Modo: Trabajo';
-            updateTimerDisplay();
+            setNextPomodoro(pomodoroTypeSelect.value);
             startBtn.textContent = 'Iniciar';
-            pauseBtn.style.display = 'inline-block';
+        }
+
+        function setNextPomodoro(value) {
+            pomodoroTypeSelect.value = value;
+            timeLeft = parseInt(value);
+            totalTime = timeLeft;
+            isBreak = value !== '1500';
+            updateTimerDisplay();
+            updateColors();
         }
 
         function playNotification() {
-            const audio = new Audio('alarm.wav');
+            const audio = new Audio('https://soundbible.com/mp3/Zen%20Temple%20Bell-SoundBible.com-331362457.mp3');
             audio.play();
         }
 
-    
-
         function toggleDarkMode() {
             document.body.classList.toggle('dark-mode');
-            darkModeToggle.textContent = document.body.classList.contains('dark-mode') ? '☀️' : '🌓';
+            darkModeToggle.textContent = document.body.classList.contains('dark-mode') ? '☼' : '☾';
+            updateColors();
+        }
+
+        function updatePomodoroCount() {
+            pomodoroCountDisplay.textContent = `Pomodoros completados: ${pomodoroCount}`;
+        }
+
+        function updateColors() {
+            const isDarkMode = document.body.classList.contains('dark-mode');
+            if (isBreak) {
+                document.documentElement.style.setProperty('--primary-color', isDarkMode ? 'var(--mint-text)' : 'var(--mint-dark)');
+                container.style.backgroundColor = isDarkMode ? 'var(--mint-dark)' : 'var(--mint-color)';
+                container.style.color = isDarkMode ? 'var(--mint-text)' : 'var(--mint-text)';
+            } else {
+                document.documentElement.style.setProperty('--primary-color', isDarkMode ? '#ff7f50' : '#ff6347');
+                container.style.backgroundColor = isDarkMode ? 'var(--container-bg)' : '#ffffff';
+                container.style.color = isDarkMode ? '#f0f0f0' : '#333';
+            }
+            timerDisplay.style.color = 'var(--primary-color)';
         }
 
         startBtn.addEventListener('click', startTimer);
-        pauseBtn.addEventListener('click', pauseTimer);
         resetBtn.addEventListener('click', resetTimer);
         darkModeToggle.addEventListener('click', toggleDarkMode);
+        pomodoroTypeSelect.addEventListener('change', resetTimer);
 
         updateTimerDisplay();
+        updateColors();
     </script>
 </body>
 </html>
