@@ -184,7 +184,7 @@
             margin-top: 20px;
             padding: 12px 20px;
             font-size: 16px;
-            background-color: #007aff;
+            background-color: #8ca2a4;
             color: #fff;
             border: none;
             border-radius: 10px;
@@ -192,13 +192,13 @@
             transition: background-color 0.2s;
         }
         .reset-button:hover {
-            background-color: #0051a8;
+            background-color: #8ca2a4;
         }
         body.dark-mode .reset-button {
-            background-color: #0a84ff;
+            background-color: #6a838a;
         }
         body.dark-mode .reset-button:hover {
-            background-color: #409cff;
+            background-color: #6a838a;
         }
 
         /* Estilos para la Calculadora */
@@ -283,7 +283,7 @@
         .converter-toggle button {
             padding: 10px 20px;
             font-size: 16px;
-            background-color: #007aff;
+            background-color: #6a838a;
             color: #fff;
             border: none;
             border-radius: 10px;
@@ -291,13 +291,13 @@
             transition: background-color 0.2s;
         }
         .converter-toggle button:hover {
-            background-color: #0051a8;
+            background-color: #b0c2c0;
         }
         body.dark-mode .converter-toggle button {
-            background-color: #0a84ff;
+            background-color: #6a838a;
         }
         body.dark-mode .converter-toggle button:hover {
-            background-color: #409cff;
+            background-color: #b0c2c0;
         }
         .converter-container {
             display: none;
@@ -641,12 +641,12 @@
             <div></div>
             <div></div>
         </div>
-        <button class="dark-mode-button" onclick="toggleDarkMode()">🌙</button>
+        <button class="dark-mode-button" onclick="toggleDarkMode()">🌚</button>
     </header>
     <nav id="navMenu">
         <a href="#" onclick="showSection('character-counter')">Contador de Caracteres</a>
         <a href="#" onclick="showSection('calculator')">Calculadora</a>
-        <a href="#" onclick="showSection('minimalistv2')">Minimalistv2</a>
+        <a href="#" onclick="showSection('minimalistv2')">Tareas</a>
         <a href="#" onclick="showSection('notepad')">Bloc de Notas</a>
     </nav>
     <main>
@@ -731,7 +731,7 @@
                     <input type="checkbox" id="showCompleted" onchange="toggleCompletedTasks()">
                     Mostrar tareas completadas
                 </label>
-                <button class="reset-button" onclick="clearCompletedTasks()">🗑 Eliminar Completadas</button>
+                <button class="reset-button" onclick="clearCompletedTasks()"> ✖ Eliminar Completadas</button>
             </div>
         </section>
         <section id="notepad" class="section">
@@ -770,7 +770,7 @@
         function toggleDarkMode() {
             document.body.classList.toggle('dark-mode');
             var darkModeButton = document.querySelector('.dark-mode-button');
-            darkModeButton.textContent = document.body.classList.contains('dark-mode') ? '☀️' : '🌙';
+            darkModeButton.textContent = document.body.classList.contains('dark-mode') ? '🌝' : '🌚';
         }
 
         // Funciones para el Contador de Caracteres
