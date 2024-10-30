@@ -982,8 +982,8 @@
                         <input type="checkbox" ${task.completed ? 'checked' : ''} onchange="toggleTask(${index})">
                         <div class="priority-indicator" style="background-color: ${task.priority};"></div>
                         <span class="todo-text ${task.completed ? 'completed' : ''}">${task.text}</span>
-                        <button class="comment-button" onclick="toggleComment(${index})">✎</button>
-                        <button class="edit-button" onclick="editTask(${index})">𓄲</button>
+                        <button class="comment-button" onclick="toggleComment(${index})">❝</button>
+                        <button class="edit-button" onclick="editTask(${index})">✎</button>
                         <button class="delete-button" onclick="deleteTask(${index})">✖︎</button>
                         <div class="comment-section" style="display: none;">
                             <textarea placeholder="Añade un comentario...">${task.comment}</textarea>
