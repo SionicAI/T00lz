@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pomodoro Timer Mejorado</title>
+    <title>Pomodoro Timer y Cronómetro</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -60,7 +60,7 @@
             margin-bottom: 1rem;
             font-size: 1.8rem;
         }
-        #timer {
+        #timer, #stopwatch {
             font-size: 3rem;
             font-weight: 700;
             color: var(--primary-color);
@@ -138,26 +138,60 @@
             margin-top: 1rem;
             color: var(--text-color);
         }
+        .tabs {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 1rem;
+        }
+        .tab {
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: border-color 0.3s;
+        }
+        .tab.active {
+            border-bottom-color: var(--primary-color);
+            font-weight: bold;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
     </style>
 </head>
 <body>
     <button id="darkModeToggle">☼/☾</button>
     <div class="container">
-        <h1>Pomodoro Timer</h1>
-        <div id="timer">25:00</div>
-        <div class="progress-bar">
-            <div class="progress" id="progressBar"></div>
+        <h1>Pomodoro y Cronómetro</h1>
+        <div class="tabs">
+            <div class="tab active" data-tab="pomodoro">Pomodoro</div>
+            <div class="tab" data-tab="stopwatch">Cronómetro</div>
         </div>
-        <select id="pomodoroType">
-            <option value="1500">Trabajo (25 minutos)</option>
-            <option value="300">Descanso corto (5 minutos)</option>
-            <option value="900">Descanso largo (15 minutos)</option>
-        </select>
-        <div class="buttons">
-            <button id="startBtn">Iniciar</button>
-            <button id="resetBtn">Reiniciar</button>
+        <div id="pomodoroTab" class="tab-content active">
+            <div id="timer">25:00</div>
+            <div class="progress-bar">
+                <div class="progress" id="progressBar"></div>
+            </div>
+            <select id="pomodoroType">
+                <option value="1500">Trabajo (25 minutos)</option>
+                <option value="300">Descanso corto (5 minutos)</option>
+                <option value="900">Descanso largo (15 minutos)</option>
+            </select>
+            <div class="buttons">
+                <button id="startBtn">Iniciar</button>
+                <button id="resetBtn">Reiniciar</button>
+            </div>
         </div>
-        <div id="pomodoroCount">Pomodoros completados: 0</div>
+        <div id="stopwatchTab" class="tab-content">
+            <div id="stopwatch">00:00:00</div>
+            <div class="buttons">
+                <button id="startStopwatch">Iniciar</button>
+                <button id="pauseStopwatch">Pausar</button>
+                <button id="resetStopwatch">Reiniciar</button>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -168,14 +202,37 @@
         let pomodoroCount = 0;
         let isBreak = false;
 
+        // Variables para el cronómetro
+        let stopwatchTimer;
+        let stopwatchTime = 0;
+        let isStopwatchRunning = false;
+
         const timerDisplay = document.getElementById('timer');
         const startBtn = document.getElementById('startBtn');
         const resetBtn = document.getElementById('resetBtn');
         const progressBar = document.getElementById('progressBar');
         const darkModeToggle = document.getElementById('darkModeToggle');
         const pomodoroTypeSelect = document.getElementById('pomodoroType');
-        const pomodoroCountDisplay = document.getElementById('pomodoroCount');
         const container = document.querySelector('.container');
+
+        const stopwatchDisplay = document.getElementById('stopwatch');
+        const startStopwatchBtn = document.getElementById('startStopwatch');
+        const pauseStopwatchBtn = document.getElementById('pauseStopwatch');
+        const resetStopwatchBtn = document.getElementById('resetStopwatch');
+
+        // Funciones para las pestañas
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const tabId = tab.getAttribute('data-tab');
+                tabs.forEach(t => t.classList.remove('active'));
+                tabContents.forEach(c => c.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById(`${tabId}Tab`).classList.add('active');
+            });
+        });
 
         function updateTimerDisplay() {
             const minutes = Math.floor(timeLeft / 60);
@@ -203,7 +260,6 @@
                         startBtn.textContent = 'Iniciar';
                         if (!isBreak) {
                             pomodoroCount++;
-                            updatePomodoroCount();
                             if (pomodoroCount % 4 === 0) {
                                 setNextPomodoro('900'); // Descanso largo
                             } else {
@@ -252,10 +308,6 @@
             updateColors();
         }
 
-        function updatePomodoroCount() {
-            pomodoroCountDisplay.textContent = `Pomodoros completados: ${pomodoroCount}`;
-        }
-
         function updateColors() {
             const isDarkMode = document.body.classList.contains('dark-mode');
             if (isBreak) {
@@ -268,12 +320,52 @@
                 container.style.color = isDarkMode ? '#f0f0f0' : '#333';
             }
             timerDisplay.style.color = 'var(--primary-color)';
+            stopwatchDisplay.style.color = 'var(--primary-color)';
+        }
+
+        // Funciones del cronómetro
+        function updateStopwatchDisplay() {
+            const hours = Math.floor(stopwatchTime / 3600);
+            const minutes = Math.floor((stopwatchTime % 3600) / 60);
+            const seconds = stopwatchTime % 60;
+            stopwatchDisplay.textContent = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function startStopwatch() {
+            if (!isStopwatchRunning) {
+                isStopwatchRunning = true;
+                stopwatchTimer = setInterval(() => {
+                    stopwatchTime++;
+                    updateStopwatchDisplay();
+                }, 1000);
+                startStopwatchBtn.textContent = 'Pausar';
+            } else {
+                pauseStopwatch();
+            }
+        }
+
+        function pauseStopwatch() {
+            clearInterval(stopwatchTimer);
+            isStopwatchRunning = false;
+            startStopwatchBtn.textContent = 'Reanudar';
+        }
+
+        function resetStopwatch() {
+            clearInterval(stopwatchTimer);
+            isStopwatchRunning = false;
+            stopwatchTime = 0;
+            updateStopwatchDisplay();
+            startStopwatchBtn.textContent = 'Iniciar';
         }
 
         startBtn.addEventListener('click', startTimer);
         resetBtn.addEventListener('click', resetTimer);
         darkModeToggle.addEventListener('click', toggleDarkMode);
         pomodoroTypeSelect.addEventListener('change', resetTimer);
+
+        startStopwatchBtn.addEventListener('click', startStopwatch);
+        pauseStopwatchBtn.addEventListener('click', pauseStopwatch);
+        resetStopwatchBtn.addEventListener('click', resetStopwatch);
 
         updateTimerDisplay();
         updateColors();
