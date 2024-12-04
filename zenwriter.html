@@ -7,7 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #ffffff;
+            --bg-color: #f2f2f2;
             --text-color: #1d1d1f;
             --toolbar-bg: #f5f5f7;
             --toolbar-color: #86868b;
@@ -15,18 +15,19 @@
             --hover-color: #e8e8e8;
             --border-color: #d2d2d7;
             --active-color: #c7c7cc;
-            --cursor-color: #00ff00;
+            --cursor-color: #ff007b;
         }
 
         [data-theme="dark"] {
             --bg-color: #1d1d1f;
-            --text-color: #f5f5f7;
+            --text-color: #f2f2f2;
             --toolbar-bg: #2c2c2e;
             --toolbar-color: #86868b;
             --accent-color: #636366;
             --hover-color: #3a3a3c;
             --border-color: #424245;
             --active-color: #48484a;
+            --cursor-color: #00ff00;
         }
 
         * {
@@ -114,7 +115,7 @@
             left: 0;
             top: 0;
             bottom: 0;
-            width: 300px;
+            width: 200px;
             background-color: var(--toolbar-bg);
             padding: 1rem;
             transform: translateX(-100%);
@@ -304,15 +305,14 @@
             <input type="text" class="document-title" id="documentTitle" placeholder="Título del documento" aria-label="Título del documento">
             <div class="editor" id="editor" contenteditable="true" placeholder="Empieza a escribir..." aria-label="Contenido del documento"></div>
             <div class="format-menu" id="formatMenu">
-                <button id="boldButton" title="Negrita">B</button>
-                <button id="italicButton" title="Cursiva">I</button>
+                <button id="boldButton" title="Negrita"><B>B</button>
+                <button id="italicButton" title="Cursiva"><I>I</button>
                 <button id="underlineButton" title="Subrayado">U</button>
-                <button id="strikethroughButton" title="Tachado">S</button>
+                <button id="strikethroughButton" title="Tachado"><S>S</button>
             </div>
         </div>
 
         <div class="menu-panel" id="menuPanel">
-            <h2>Documentos</h2>
             <button id="newDocument" title="Nuevo documento">+</button>
             <ul class="documents-list" id="documentsList"></ul>
         </div>
