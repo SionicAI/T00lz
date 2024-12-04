@@ -3,97 +3,153 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mis Herramientas Retro</title>
+    <title>Mis Herramientas</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;600&display=swap">
     <style>
-        body {
-            font-family: 'Courier New', Courier, monospace;
-            line-height: 1.6;
-            color: #000;
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #000000;
+            --accent-color: #ff0000;
+            --hover-color: #f0f0f0;
+        }
+
+        * {
             margin: 0;
-            padding: 20px;
-            background-color: #008080;
-            background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.1' fill-rule='evenodd'%3E%3Cpath d='M0 40L40 0H20L0 20M40 40V20L20 40'/%3E%3C/g%3E%3C/svg%3E");
-        }
-        .window {
-            background-color: #c0c0c0;
-            border: 2px solid #ffffff;
-            border-right-color: #808080;
-            border-bottom-color: #808080;
-            box-shadow: inset -1px -1px #0a0a0a, inset 1px 1px #dfdfdf, inset -2px -2px grey, inset 2px 2px #fff;
-            padding: 2px;
-            max-width: 800px;
-            margin: 20px auto;
-        }
-        .title-bar {
-            background: linear-gradient(90deg, #000080, #1084d0);
-            padding: 3px 2px 3px 3px;
-            color: white;
-            font-weight: bold;
-        }
-        .content {
-            padding: 20px;
-            background-color: #ffffff;
-        }
-        h1 {
-            border-bottom: 2px solid #000080;
-            padding-bottom: 10px;
-            color: #000080;
-        }
-        ul {
-            list-style-type: none;
             padding: 0;
+            box-sizing: border-box;
+            font-family: 'IBM Plex Mono', monospace;
         }
-        li {
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
+
+        body {
+            background: var(--bg-color);
+            color: var(--text-color);
+            padding: 2rem;
+            border: 8px solid var(--text-color);
+            min-height: 100vh;
         }
-        .icon {
-            width: 20px;
-            height: 20px;
-            margin-right: 10px;
-            background-color: #ffaa00;
-            display: inline-block;
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
         }
-        a {
-            color: #0000FF;
-            text-decoration: none;
-            padding: 2px 5px;
+
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 2rem;
+            text-transform: uppercase;
+            border-bottom: 4px solid var(--text-color);
+            padding-bottom: 1rem;
         }
-        a:hover {
-            background-color: #000080;
-            color: #ffffff;
-        }
+
         .description {
-            font-style: italic;
-            margin-bottom: 20px;
-            border: 1px dashed #808080;
-            padding: 10px;
-            background-color: #ffffc0;
+            font-size: 1.2rem;
+            margin-bottom: 4rem;
+            padding: 1rem;
+            border: 2px solid var(--text-color);
+        }
+
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .tool-card {
+            border: 4px solid var(--text-color);
+            padding: 2rem;
+            transition: background-color 0.2s;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 200px;
+        }
+
+        .tool-card:hover {
+            background-color: var(--text-color);
+            color: var(--bg-color);
+        }
+
+        .tool-title {
+            font-size: 1.5rem;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+        }
+
+        .tool-description {
+            font-size: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        /* Scrollbar personalizada */
+        ::-webkit-scrollbar {
+            width: 12px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-color);
+            border-left: 2px solid var(--text-color);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--text-color);
+        }
+
+        /* Selección de texto */
+        ::selection {
+            background: var(--text-color);
+            color: var(--bg-color);
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 1rem;
+                border-width: 4px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .tool-card {
+                min-height: 150px;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="window">
-        <div class="title-bar">Mis Herramientas Retro</div>
-        <div class="content">
-            <h1>Mis Herramientas</h1>
-            <p class="description">Bienvenido a mi colección de herramientas. Aquí encontrarás acceso a varias utilidades que he desarrollado, con un toque nostálgico de los 90s.</p>
-            <ul>
-                <li>
-                    <span class="icon"></span>
-                    <a href="Pomodoro.html">Pomodoro</a> - Haz que cada minuto cuente
-                </li>
-                <li>
-                    <span class="icon"></span>
-                    <a href="Compilado.html">Multi Tarea</a> - Si quieres contar, este es el lugar. 
-                </li>
-                <li>
-                    <span class="icon"></span>
-                    <a href="zenwriter.html">MuText</a> - Si quieres contar, este es el lugar. 
-                </li>
-                <!-- Añade más herramientas aquí según las vayas desarrollando -->
-            </ul>
+    <div class="container">
+        <h1>MIS HERRAMIENTAS</h1>
+        
+        <div class="description">
+            Colección de herramientas minimalistas para maximizar la productividad.
+        </div>
+
+        <div class="tools-grid">
+            <a href="Pomodoro.html">
+                <div class="tool-card">
+                    <div class="tool-title">POMODORO</div>
+                    <div class="tool-description">Haz que cada minuto cuente</div>
+                </div>
+            </a>
+
+            <a href="Compilado.html">
+                <div class="tool-card">
+                    <div class="tool-title">MULTI TAREA</div>
+                    <div class="tool-description">Si quieres contar, este es el lugar</div>
+                </div>
+            </a>
+
+            <a href="zenwriter.html">
+                <div class="tool-card">
+                    <div class="tool-title">MUTEXT</div>
+                    <div class="tool-description">Escribe sin distracciones</div>
+                </div>
+            </a>
         </div>
     </div>
 </body>
