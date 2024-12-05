@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MuType</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="apple-touch-icon" href="favicon.png">
     <style>
         :root {
             --bg-color: #f2f2f2;
@@ -559,6 +562,45 @@ function updateWordCount() {
         document.getElementById('strikethroughButton').addEventListener('click', () => applyFormat('strikeThrough'));
 
         editor.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                const selection = window.getSelection();
+                const range = selection.getRangeAt(0);
+                const currentLine = range.startContainer.textContent;
+                
+                // Verifica si estamos en una línea que comienza con - o *
+                if (currentLine.trim().startsWith('-') || currentLine.trim().startsWith('*')) {
+                    e.preventDefault();
+                    
+                    // Si la línea actual está vacía (solo tiene el marcador), salir del modo lista
+                    if (currentLine.trim() === '-' || currentLine.trim() === '*') {
+                        document.execCommand('insertHTML', false, '<br>');
+                        return;
+                    }
+                    
+                    // Determinar qué marcador se está usando (- o *)
+                    const marker = currentLine.trim().startsWith('-') ? '- ' : '* ';
+                    
+                    // Insertar nueva línea con el marcador
+                    document.execCommand('insertHTML', false, '<br>' + marker);
+                }
+            }
+            
+            if (e.key === ' ') {
+                const text = editor.innerText;
+                const lines = text.split('\n');
+                const currentLine = lines[lines.length - 1];
+                
+                // Convertir en lista cuando se escribe "- " o "* "
+                if (currentLine === '-' || currentLine === '*') {
+                    e.preventDefault();
+                    const marker = currentLine === '-' ? '- ' : '* ';
+                    const range = window.getSelection().getRangeAt(0);
+                    range.deleteContents();
+                    range.insertNode(document.createTextNode(marker));
+                }
+            }
+
+            // Mantener los atajos de teclado existentes
             if (e.metaKey || e.ctrlKey) {
                 switch (e.key.toLowerCase()) {
                     case 'b':
@@ -575,6 +617,20 @@ function updateWordCount() {
                         break;
                 }
             }
+        });
+
+        // Agregar un evento para manejar el pegado de texto
+        editor.addEventListener('paste', (e) => {
+            e.preventDefault();
+            const text = e.clipboardData.getData('text/plain');
+            const lines = text.split('\n');
+            const formattedText = lines.map(line => {
+                if (line.trim().startsWith('-') || line.trim().startsWith('*')) {
+                    return line;
+                }
+                return line;
+            }).join('\n');
+            document.execCommand('insertText', false, formattedText);
         });
 
         document.addEventListener('DOMContentLoaded', () => {
