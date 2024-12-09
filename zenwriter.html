@@ -205,8 +205,22 @@
             transition: color 0.2s;
         }
 
-        .theme-toggle:hover {
-            color: var(--text-color);
+        .patreon-button {
+            position: fixed;
+            left: 1.2rem;
+            bottom: 4rem;  /* Posicionado encima del theme-toggle */
+            background: none;
+            border: none;
+            color: var(--toolbar-color);
+            cursor: pointer;
+            font-size: 1.5rem;
+            padding: 0.5rem;
+            transition: color 0.2s;
+            text-decoration: none;
+        }
+
+        .patreon-button:hover {
+            color: #ff0000;
         }
 
         .welcome-message {
@@ -321,6 +335,84 @@
                 padding: 0.3rem 0.6rem;
             }
         }
+
+        .share-button {
+            position: fixed;
+            left: 1.2rem;
+            bottom: 7rem;
+            background: none;
+            border: none;
+            color: var(--toolbar-color);
+            cursor: pointer;
+            font-size: 1.2rem;
+            padding: 0.5rem;
+            transition: color 0.2s;
+        }
+
+        .share-button:hover {
+            color: var(--text-color);
+        }
+
+        .share-popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: var(--toolbar-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            max-width: 400px;
+            width: 90%;
+            z-index: 1002;
+        }
+
+        .share-popup.active {
+            display: block;
+        }
+
+        .share-popup p {
+            margin-bottom: 1rem;
+            line-height: 1.5;
+            font-style: normal;
+            font-weight: 300;
+        }
+
+        .share-popup .buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+
+        .share-popup button {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: var(--accent-color);
+            color: var(--bg-color);
+            transition: opacity 0.2s;
+        }
+
+        .share-popup button:hover {
+            opacity: 0.8;
+        }
+
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1001;
+        }
+
+        .overlay.active {
+            display: block;
+        }
     </style>
 </head>
 <body>
@@ -346,6 +438,15 @@
             <button id="newDocument" title="Nuevo documento">+</button>
         </div>
 
+        <button class="share-button" id="shareButton" title="Compartir MuType" aria-label="Compartir MuType">⇱</button>
+        <div class="overlay" id="shareOverlay"></div>
+        <div class="share-popup" id="sharePopup">
+            <p>Un lugar para escribir con claridad. Sin ruido, solo tú y tu creatividad.</p>
+            <div class="buttons">
+                <button id="copyShareLink">Copiar</button>
+            </div>
+        </div>
+        <a href="https://www.patreon.com/tuusuario" target="_blank" class="patreon-button" title="Apoyar en Patreon" aria-label="Apoyar en Patreon">♥︎</a>
         <button class="theme-toggle" id="themeToggle" title="Cambiar tema" aria-label="Cambiar tema">◐</button>
     </div>
 
@@ -367,13 +468,112 @@
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script>
 
-function updateWordCount() {
-        const text = editor.innerText || '';
-        const wordCount = text.trim() ? text.trim().split(/\s+/).length : 0;
-        const charCount = text.length;
-        document.getElementById('wordCounter').textContent = 
-            `${wordCount} palabras | ${charCount} caracteres`;
-    }
+        const translations = {
+            es: {
+                title: 'MuType',
+                placeholder: 'Empieza a escribir...',
+                titlePlaceholder: 'Título del documento',
+                wordCount: 'palabras',
+                charCount: 'caracteres',
+                welcome: {
+                    title: 'Bienvenido a MuType',
+                    description: 'MuType es un editor de texto minimalista que te permite escribir sin distracciones.',
+                    features: 'Características principales:',
+                    featuresList: [
+                        'Soporte para Markdown',
+                        'Múltiples documentos',
+                        'Tema claro/oscuro',
+                        'Guardado automático',
+                        'Formato de texto con atajos de teclado'
+                    ],
+                    startMessage: 'Para comenzar, simplemente empieza a escribir o crea un nuevo documento.',
+                    startButton: 'Comenzar a escribir'
+                },
+                share: {
+                    message: 'Un lugar para escribir con claridad. Sin ruido, solo tú y tu creatividad.',
+                    copyButton: 'Copiar',
+                    copied: '¡Copiado!',
+                    thanks: 'Gracias por apoyar MuType y la escritura sin distracciones.'
+                },
+                buttons: {
+                    menu: 'Menú',
+                    theme: 'Cambiar tema',
+                    share: 'Compartir MuType',
+                    support: 'Apoyar en Patreon',
+                    newDoc: 'Nuevo documento'
+                }
+            },
+            en: {
+                title: 'MuType',
+                placeholder: 'Start writing...',
+                titlePlaceholder: 'Document title',
+                wordCount: 'words',
+                charCount: 'characters',
+                welcome: {
+                    title: 'Welcome to MuType',
+                    description: 'MuType is a minimalist text editor that lets you write without distractions.',
+                    features: 'Main features:',
+                    featuresList: [
+                        'Markdown support',
+                        'Multiple documents',
+                        'Light/dark theme',
+                        'Auto-save',
+                        'Keyboard shortcuts for formatting'
+                    ],
+                    startMessage: 'To begin, simply start writing or create a new document.',
+                    startButton: 'Start writing'
+                },
+                share: {
+                    message: 'A place to write with clarity. No noise, just you and your creativity.',
+                    copyButton: 'Copy',
+                    copied: 'Copied!',
+                    thanks: 'Thank you for supporting MuType and distraction-free writing.'
+                },
+                buttons: {
+                    menu: 'Menu',
+                    theme: 'Toggle theme',
+                    share: 'Share MuType',
+                    support: 'Support on Patreon',
+                    newDoc: 'New document'
+                }
+            }
+        };
+
+        function getPreferredLanguage() {
+            const savedLang = localStorage.getItem('mutype-language');
+            if (savedLang) return savedLang;
+            
+            const browserLang = navigator.language.split('-')[0];
+            return translations[browserLang] ? browserLang : 'en';
+        }
+
+        function updateUILanguage(lang) {
+            const t = translations[lang];
+            
+            editor.setAttribute('placeholder', t.placeholder);
+            documentTitle.setAttribute('placeholder', t.titlePlaceholder);
+            
+            document.getElementById('menuToggle').title = t.buttons.menu;
+            document.getElementById('themeToggle').title = t.buttons.theme;
+            document.getElementById('shareButton').title = t.buttons.share;
+            document.getElementById('newDocument').title = t.buttons.newDoc;
+            
+            const sharePopup = document.getElementById('sharePopup');
+            sharePopup.querySelector('p').textContent = t.share.message;
+            document.getElementById('copyShareLink').textContent = t.share.copyButton;
+            
+            updateWordCount();
+        }
+
+        function updateWordCount() {
+            const text = editor.innerText || '';
+            const wordCount = text.trim() ? text.trim().split(/\s+/).length : 0;
+            const charCount = text.length;
+            const t = translations[getPreferredLanguage()];
+            document.getElementById('wordCounter').textContent = 
+                `${wordCount} ${t.wordCount} | ${charCount} ${t.charCount}`;
+        }
+
         marked.setOptions({
             headerIds: false,
             mangle: false
@@ -486,7 +686,6 @@ function updateWordCount() {
             formatMenu.style.left = `${x}px`;
             formatMenu.style.top = `${y}px`;
 
-            // Actualizar el estado de los botones
             document.getElementById('boldButton').style.fontWeight = document.queryCommandState('bold') ? 'bold' : 'normal';
             document.getElementById('italicButton').style.fontStyle = document.queryCommandState('italic') ? 'italic' : 'normal';
             document.getElementById('underlineButton').style.textDecoration = document.queryCommandState('underline') ? 'underline' : 'none';
@@ -567,20 +766,16 @@ function updateWordCount() {
                 const range = selection.getRangeAt(0);
                 const currentLine = range.startContainer.textContent;
                 
-                // Verifica si estamos en una línea que comienza con - o *
                 if (currentLine.trim().startsWith('-') || currentLine.trim().startsWith('*')) {
                     e.preventDefault();
                     
-                    // Si la línea actual está vacía (solo tiene el marcador), salir del modo lista
                     if (currentLine.trim() === '-' || currentLine.trim() === '*') {
                         document.execCommand('insertHTML', false, '<br>');
                         return;
                     }
                     
-                    // Determinar qué marcador se está usando (- o *)
                     const marker = currentLine.trim().startsWith('-') ? '- ' : '* ';
                     
-                    // Insertar nueva línea con el marcador
                     document.execCommand('insertHTML', false, '<br>' + marker);
                 }
             }
@@ -590,7 +785,6 @@ function updateWordCount() {
                 const lines = text.split('\n');
                 const currentLine = lines[lines.length - 1];
                 
-                // Convertir en lista cuando se escribe "- " o "* "
                 if (currentLine === '-' || currentLine === '*') {
                     e.preventDefault();
                     const marker = currentLine === '-' ? '- ' : '* ';
@@ -600,7 +794,6 @@ function updateWordCount() {
                 }
             }
 
-            // Mantener los atajos de teclado existentes
             if (e.metaKey || e.ctrlKey) {
                 switch (e.key.toLowerCase()) {
                     case 'b':
@@ -619,7 +812,6 @@ function updateWordCount() {
             }
         });
 
-        // Agregar un evento para manejar el pegado de texto
         editor.addEventListener('paste', (e) => {
             e.preventDefault();
             const text = e.clipboardData.getData('text/plain');
@@ -651,6 +843,9 @@ function updateWordCount() {
             } else {
                 welcomeMessage.style.display = 'none';
             }
+
+            const lang = getPreferredLanguage();
+            updateUILanguage(lang);
         });
 
         editor.addEventListener('input', updateWordCount);
@@ -660,6 +855,44 @@ function updateWordCount() {
                 e.preventDefault();
                 editor.focus();
             }
+        });
+
+        document.getElementById('shareButton').addEventListener('click', () => {
+            document.getElementById('shareOverlay').classList.add('active');
+            document.getElementById('sharePopup').classList.add('active');
+        });
+
+        document.getElementById('copyShareLink').addEventListener('click', () => {
+            const t = translations[getPreferredLanguage()];
+            const shareText = t.share.message + '\n' + window.location.href;
+            
+            navigator.clipboard.writeText(shareText).then(() => {
+                const copyButton = document.getElementById('copyShareLink');
+                copyButton.textContent = t.share.copied;
+                
+                const popupMessage = document.getElementById('sharePopup').querySelector('p');
+                popupMessage.textContent = t.share.thanks;
+                
+                setTimeout(() => {
+                    document.getElementById('shareOverlay').classList.remove('active');
+                    document.getElementById('sharePopup').classList.remove('active');
+                    
+                    setTimeout(() => {
+                        copyButton.textContent = t.share.copyButton;
+                        popupMessage.textContent = t.share.message;
+                    }, 200);
+                }, 2000);
+            });
+        });
+
+        document.getElementById('closeSharePopup').addEventListener('click', () => {
+            document.getElementById('shareOverlay').classList.remove('active');
+            document.getElementById('sharePopup').classList.remove('active');
+        });
+
+        document.getElementById('shareOverlay').addEventListener('click', () => {
+            document.getElementById('shareOverlay').classList.remove('active');
+            document.getElementById('sharePopup').classList.remove('active');
         });
     </script>
 </body>
