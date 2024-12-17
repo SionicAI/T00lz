@@ -356,15 +356,15 @@
             border: none;
             background-color: transparent;
             color: inherit;
-            appearance: none;
-            text-align: center;
+            appearance: auto;
+            text-align: left;
             flex-grow: 1;
             margin-right: 10px;
             transition: background-color 0.3s, color 0.3s;
         }
         .icon-buttons {
             display: flex;
-            gap: 10px;
+            gap: 8px;
         }
         .icon-button {
             background: none;
@@ -384,13 +384,13 @@
         .todo-input {
             display: flex;
             align-items: center;
-            justify-content: center;
-            margin-bottom: 20px;
+            justify-content: Left;
+            margin-bottom: 10px;
         }
         .todo-input input {
-            width: 100%;
+            width: 80%;
             max-width: 500px;
-            padding: 10px;
+            padding: 15px;
             font-size: 16px;
             border: none;
             border-bottom: 1px solid #ccc;
@@ -402,34 +402,11 @@
         body.dark-mode .todo-input input {
             border-bottom: 1px solid #3a3a3c;
         }
-        .priority-selector {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 20px;
-        }
-        .priority-option {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            margin: 0 10px;
-            cursor: pointer;
-            border: 2px solid transparent;
-            transition: border-color 0.3s;
-        }
-        .priority-option.selected {
-            border-color: #333;
-        }
+        
         body.dark-mode .priority-option.selected {
             border-color: #f5f5f5;
         }
-        .color-red { background-color: #e57373; }
-        .color-yellow { background-color: #ffb74d; }
-        .color-green { background-color: #81c784; }
-        .color-blue { background-color: #64b5f6; }
-        .color-gray { background-color: #90a4ae; }
-        .todo-list {
-            list-style: none;
-        }
+        
         .todo-item {
             display: flex;
             align-items: center;
@@ -446,8 +423,8 @@
         }
         .todo-item input[type="checkbox"] {
             margin-right: 15px;
-            width: 24px;
-            height: 24px;
+            width: 12px;
+            height: 12px;
             cursor: pointer;
             accent-color: #333;
             transition: accent-color 0.3s;
@@ -468,12 +445,7 @@
         body.dark-mode .todo-text.completed {
             color: #666;
         }
-        .priority-indicator {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            margin-right: 15px;
-        }
+        
         .comment-button, .edit-button, .delete-button {
             background: none;
             border: none;
@@ -517,8 +489,8 @@
         }
         .todo-footer input[type="checkbox"] {
             margin-right: 10px;
-            width: 20px;
-            height: 20px;
+            width: 10px;
+            height: 10px;
             cursor: pointer;
             accent-color: #333;
             transition: accent-color 0.3s;
@@ -526,7 +498,6 @@
         body.dark-mode .todo-footer input[type="checkbox"] {
             accent-color: #f5f5f5;
         }
-
         /* Estilos para el Bloc de Notas */
         #notepad {
             max-width: 800px;
@@ -710,7 +681,7 @@
                 <div class="icon-buttons">
                     <button class="icon-button" title="Nuevo Grupo" onclick="createNewGroup()">＋</button>
                     <button class="icon-button" title="Editar Grupo" onclick="editGroup()">✎</button>
-                    <button class="icon-button" title="Eliminar Grupo" onclick="deleteGroup()">✖︎</button>
+                    <button class="icon-button" title="Eliminar Grupo" onclick="deleteGroup()">x</button>
                 </div>
             </div>
             <div class="todo-input">
