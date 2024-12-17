@@ -671,21 +671,21 @@
             <div class="calculator-display" id="calcDisplay">0</div>
             <div class="calculator-grid">
                 <button onclick="clearDisplay()">AC</button>
-                <button onclick="pressKey('%')" class="operator">%</button>
-                <button onclick="pressKey('/')" class="operator">÷</button>
-                <button onclick="pressKey('*')" class="operator">×</button>
+                <button onclick="pressKey('%')">%</button>
+                <button onclick="pressKey('/')">/</button>
+                <button onclick="pressKey('*')">*</button>
                 <button onclick="pressKey('7')">7</button>
                 <button onclick="pressKey('8')">8</button>
                 <button onclick="pressKey('9')">9</button>
-                <button onclick="pressKey('-')" class="operator">−</button>
+                <button onclick="pressKey('-')">-</button>
                 <button onclick="pressKey('4')">4</button>
                 <button onclick="pressKey('5')">5</button>
                 <button onclick="pressKey('6')">6</button>
-                <button onclick="pressKey('+')" class="operator">+</button>
+                <button onclick="pressKey('+')">+</button>
                 <button onclick="pressKey('1')">1</button>
                 <button onclick="pressKey('2')">2</button>
                 <button onclick="pressKey('3')">3</button>
-                <button onclick="calculate()" class="equals" style="grid-row: span 2;">=</button>
+                <button onclick="calculate()" style="grid-row: span 2;">=</button>
                 <button onclick="pressKey('0')" style="grid-column: span 2;">0</button>
                 <button onclick="pressKey('.')">.</button>
             </div>
@@ -715,13 +715,6 @@
             </div>
             <div class="todo-input">
                 <input type="text" id="newTaskInput" placeholder="Añade una nueva tarea..." onkeypress="if(event.key === 'Enter') addTask()">
-            </div>
-            <div class="priority-selector">
-                <div class="priority-option color-red" data-color="#e57373"></div>
-                <div class="priority-option color-yellow" data-color="#ffb74d"></div>
-                <div class="priority-option color-green selected" data-color="#81c784"></div>
-                <div class="priority-option color-blue" data-color="#64b5f6"></div>
-                <div class="priority-option color-gray" data-color="#90a4ae"></div>
             </div>
             <ul class="todo-list" id="taskList">
                 <!-- Tareas dinámicas -->
@@ -897,7 +890,6 @@
         let todoData = JSON.parse(localStorage.getItem('todoData')) || {};
         let currentGroup = localStorage.getItem('currentGroup') || '';
         let showCompleted = false;
-        let selectedPriorityColor = '#81c784';
 
         function initializeTodoList() {
             let groupSelect = document.getElementById('groupSelect');
@@ -962,7 +954,6 @@
                 todoData[currentGroup].tasks.push({
                     text: taskText,
                     completed: false,
-                    priority: selectedPriorityColor,
                     comment: ''
                 });
                 document.getElementById('newTaskInput').value = '';
