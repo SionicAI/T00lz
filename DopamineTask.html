@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dopamine Tasks</title>
+    <link rel="stylesheet" href="dopaminestyle.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <div class="tasks-container">
+            <div class="tasks-header">
+                <div class="group-selector">
+                    <select id="groupSelect" class="group-select">
+                        <!-- Grupos se agregarán dinámicamente -->
+                    </select>
+                    <div class="group-actions">
+                        <button class="icon-btn add-group-btn" title="Nuevo grupo">+</button>
+                        <button class="icon-btn edit-group-btn" title="Editar grupo">✎</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="pomodoro-section">
+                <div class="pomodoro-header">
+                    <button class="toggle-pomodoro">
+                        <span class="arrow">▸</span> Pomodoro Timer
+                    </button>
+                </div>
+                
+                <div class="pomodoro-content">
+                    <div class="timer-display">
+                        <span id="minutes">25</span>:<span id="seconds">00</span>
+                    </div>
+                    
+                    <div class="timer-modes">
+                        <button class="timer-mode active" data-mode="work" data-time="25">Trabajo</button>
+                        <button class="timer-mode" data-mode="break" data-time="5">Descanso</button>
+                        <button class="timer-mode" data-mode="long" data-time="15">Descanso Largo</button>
+                    </div>
+                    
+                    <div class="timer-controls">
+                        <button id="startTimer" class="timer-control">
+                            <svg viewBox="0 0 24 24" class="timer-icon">
+                                <path d="M8 5v14l11-7z"/>
+                            </svg>
+                        </button>
+                        <button id="pauseTimer" class="timer-control">
+                            <svg viewBox="0 0 24 24" class="timer-icon">
+                                <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+                            </svg>
+                        </button>
+                        <button id="resetTimer" class="timer-control">
+                            <svg viewBox="0 0 24 24" class="timer-icon">
+                                <path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="add-task">
+                <input type="text" id="newTaskInput" placeholder="Nueva tarea...">
+                <button class="add-task-btn">+</button>
+            </div>
+
+            <div class="tasks-list" id="tasksList">
+                <!-- Tareas se agregarán dinámicamente -->
+            </div>
+
+            <div class="completed-section">
+                <div class="completed-header">
+                    <button class="toggle-completed">
+                        <span class="arrow">▸</span> Tareas Completadas
+                    </button>
+                    <button class="clear-completed" title="Eliminar completadas">🗑️</button>
+                </div>
+                <div class="completed-tasks-list" id="completedTasksList">
+                    <!-- Tareas completadas se agregarán dinámicamente -->
+                </div>
+            </div>
+            
+            <div class="theme-container">
+                <button class="theme-toggle" title="Cambiar tema">🌙</button>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+    <script src="dopaminescript.js"></script>
+</body>
+</html>
