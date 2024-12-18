@@ -3,63 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MuType</title>
+    <title>Mutxt</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
     <link rel="icon" type="image/png" href="favicon.png">
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     <link rel="apple-touch-icon" href="favicon.png">
     <style>
         :root {
-            --bg-color: #f2f2f2;
+            --bg-color: #CAD0C9;
             --text-color: #1d1d1f;
+            --text-menu-color: #333335;
             --toolbar-bg: #f5f5f7;
             --toolbar-color: #86868b;
-            --accent-color: #8e8e93;
+            --accent-color: #FE242A;
             --hover-color: #e8e8e8;
             --border-color: #d2d2d7;
             --active-color: #c7c7cc;
             --cursor-color: #ff0000;
         }
-
+    
         [data-theme="dark"] {
             --bg-color: #1d1d1f;
             --text-color: #f2f2f2;
+            --text-menu-color: #333335;
             --toolbar-bg: #2c2c2e;
             --toolbar-color: #86868b;
-            --accent-color: #636366;
+            --accent-color: #01bb8f;
             --hover-color: #3a3a3c;
             --border-color: #424245;
             --active-color: #48484a;
             --cursor-color: #00ff00;
         }
-
+    
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-
+    
         body {
-            font-family: 'Roboto Mono', monospace;
+            font-family: 'Space Grotesk', sans-serif;
             background-color: var(--bg-color);
             color: var(--text-color);
             transition: background-color 0.3s, color 0.3s;
             line-height: 1.5;
         }
-
+    
         .container {
             display: flex;
             flex-direction: column;
             min-height: 100vh;
         }
-
+    
         .toolbar {
             display: flex;
             justify-content: flex-start;
             align-items: center;
             padding: 0.5rem 1rem;
         }
-
+    
         .toolbar button {
             background: none;
             border: none;
@@ -69,11 +71,11 @@
             padding: 0.5rem;
             transition: color 0.2s;
         }
-
+    
         .toolbar button:hover {
             color: var(--text-color);
         }
-
+    
         .editor-container {
             flex: 1;
             display: flex;
@@ -84,7 +86,7 @@
             width: 100%;
             position: relative;
         }
-
+    
         .document-title {
             font-size: 2rem;
             font-weight: bold;
@@ -95,103 +97,100 @@
             width: 100%;
             font-family: 'Roboto Mono', monospace;
         }
-
-        .editor {
-        flex: 1;
-        font-size: 1.2rem;
-        line-height: 1.6;
-        border: none;
-        resize: none;
-        background: none;
-        color: var(--text-color);
-        font-family: 'Roboto Mono', monospace;
-        caret-color: var(--cursor-color);
-        caret-width: 5px;  /* Cursor más grueso */
-    }
-
     
-
-    .word-counter {
-        position: fixed;
-        bottom: 5rem;
-        right: 1rem;
-        font-size: 0.8rem;
-        color: var(--toolbar-color);
-        background: var(--bg-color);
-        padding: 0.5rem 1rem;
-        opacity: 0.7;
-        z-index: 1000;
-    }
-
+        .editor {
+            flex: 1;
+            font-size: 1.2rem;
+            line-height: 1.6;
+            border: none;
+            resize: none;
+            background: none;
+            color: var(--text-color);
+            font-family: 'Roboto Mono', monospace;
+            caret-color: var(--cursor-color);
+        }
+    
+        .word-counter {
+            position: fixed;
+            bottom: 5rem;
+            right: 1rem;
+            font-size: 0.8rem;
+            color: var(--toolbar-color);
+            background: var(--bg-color);
+            padding: 0.5rem 1rem;
+            opacity: 0.7;
+            z-index: 1000;
+        }
+    
         .editor:focus, .document-title:focus {
             outline: none;
         }
-
+    
         .menu-panel {
             position: fixed;
             left: 0;
             top: 0;
             bottom: 0;
             width: 200px;
-            background-color: var(--toolbar-bg);
+            background-color: var(--accent-color);
             padding: 1rem;
             transform: translateX(-100%);
             transition: transform 0.3s;
             z-index: 1000;
             overflow-y: auto;
         }
-
+    
         .menu-panel.active {
             transform: translateX(0);
         }
-
+    
         .menu-panel h2 {
             font-size: 1.5rem;
             margin-bottom: 1rem;
             color: var(--text-color);
         }
-
+    
         .documents-list {
             list-style: none;
             margin-bottom: 4rem;
         }
-
+    
         .document-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 0.75rem;
             cursor: pointer;
-            border-bottom: 1px solid var(--border-color);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             transition: background-color 0.2s;
             font-weight: 300;
             font-style: normal;
         }
-
+    
         .document-item:hover {
-            background-color: var(--hover-color);
+            background-color: rgba(255, 255, 255, 0.1);
         }
-
+    
         .document-item.active {
-            background-color: var(--active-color);
-            color: var(--text-color);
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
             font-weight: 300;
         }
-
+    
         .document-item button {
             background: none;
             border: none;
-            color: var(--toolbar-color);
+            color: rgba(255, 255, 255, 0.8);
             cursor: pointer;
             font-size: 1rem;
             padding: 0.25rem 0.5rem;
             transition: color 0.2s;
         }
-
+    
         .document-item button:hover {
-            color: var(--text-color);
+            color: white;
         }
-
+    
         .theme-toggle {
             position: fixed;
             left: 1rem;
@@ -204,7 +203,7 @@
             padding: 0.5rem;
             transition: color 0.2s;
         }
-
+    
         .patreon-button {
             position: fixed;
             left: 1.2rem;
@@ -218,11 +217,11 @@
             transition: color 0.2s;
             text-decoration: none;
         }
-
+    
         .patreon-button:hover {
             color: #ff0000;
         }
-
+    
         .welcome-message {
             position: fixed;
             top: 50%;
@@ -235,16 +234,16 @@
             width: 90%;
             z-index: 1001;
         }
-
+    
         .welcome-message h1 {
             font-size: 2rem;
             margin-bottom: 1rem;
         }
-
+    
         .welcome-message p, .welcome-message ul {
             margin-bottom: 1rem;
         }
-
+    
         .welcome-message button {
             background-color: var(--accent-color);
             color: white;
@@ -254,23 +253,23 @@
             cursor: pointer;
             transition: background-color 0.2s;
         }
-
+    
         .welcome-message button:hover {
             background-color: var(--text-color);
         }
-
+    
         .format-menu {
             position: absolute;
             background-color: var(--toolbar-bg);
             border: 1px solid var(--border-color);
-            border-radius: 4px;
+            border-radius: 15px;
             padding: 0.5rem;
             display: none;
         }
-
+    
         .format-menu button {
             background: none;
-            border: none;
+            border: 5px;
             color: var(--toolbar-color);
             cursor: pointer;
             font-size: 1rem;
@@ -279,15 +278,15 @@
             font-weight: normal;
             font-style: light;
         }
-
+    
         .format-menu button:hover {
             color: var(--text-color);
         }
-
+    
         #newDocument {
             background: none;
             border: none;
-            color: var(--toolbar-color);
+            color: rgba(255, 255, 255, 0.9);
             cursor: pointer;
             font-size: 2rem;
             padding: 0.5rem;
@@ -295,38 +294,37 @@
             position: fixed;
             bottom: 1rem;
             left: 5rem;
-            
         }
-
+    
         #newDocument:hover {
-            color: var(--text-color);
+            color: white;
         }
-
+    
         @media (max-width: 600px) {
             .editor-container {
                 padding: 1rem;
             }
-
+    
             .document-title {
                 font-size: 1.5rem;
             }
-
+    
             .editor {
                 font-size: 1rem;
             }
         }
-
+    
         .document-item span {
             font-weight: 300;
             font-style: normal;
             font-family: 'Roboto Mono', monospace;
         }
-
+    
         .document-item.active span {
             font-weight: 300;
             font-style: normal;
         }
-
+    
         @media (max-width: 768px) {
             .word-counter {
                 bottom: 4rem;
@@ -335,7 +333,7 @@
                 padding: 0.3rem 0.6rem;
             }
         }
-
+    
         .share-button {
             position: fixed;
             left: 1.2rem;
@@ -348,11 +346,11 @@
             padding: 0.5rem;
             transition: color 0.2s;
         }
-
+    
         .share-button:hover {
             color: var(--text-color);
         }
-
+    
         .share-popup {
             display: none;
             position: fixed;
@@ -367,24 +365,24 @@
             width: 90%;
             z-index: 1002;
         }
-
+    
         .share-popup.active {
             display: block;
         }
-
+    
         .share-popup p {
             margin-bottom: 1rem;
             line-height: 1.5;
             font-style: normal;
             font-weight: 300;
         }
-
+    
         .share-popup .buttons {
             display: flex;
             justify-content: flex-end;
             gap: 1rem;
         }
-
+    
         .share-popup button {
             padding: 0.5rem 1rem;
             border: none;
@@ -394,11 +392,11 @@
             color: var(--bg-color);
             transition: opacity 0.2s;
         }
-
+    
         .share-popup button:hover {
             opacity: 0.8;
         }
-
+    
         .overlay {
             display: none;
             position: fixed;
@@ -409,16 +407,190 @@
             background-color: rgba(0, 0, 0, 0.5);
             z-index: 1001;
         }
-
+    
         .overlay.active {
             display: block;
         }
+    
+        .share-button,
+        .patreon-button,
+        .theme-toggle {
+            background: none;
+            border: none;
+            padding: 0.5rem;
+            cursor: pointer;
+            color: var(--text-color);
+            opacity: 0.7;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: fixed;
+            left: 1.2rem;
+        }
+    
+        .share-button {
+            bottom: 7rem;
+        }
+    
+        .patreon-button {
+            bottom: 4rem;
+        }
+    
+        .theme-toggle {
+            bottom: 1rem;
+        }
+        
+        .share-button:hover {
+            opacity: 1;
+            transform: scale(1.1);
+            bottom: 7rem;
+        }
+        
+        .patreon-button:hover {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+    
+        .patreon-button:hover svg {
+            stroke: #FE242A;
+        }
+    
+        [data-theme="dark"] .patreon-button:hover svg {
+            stroke: #FF424D;
+        }
+    
+        .theme-toggle svg {
+            transition: transform 0.5s ease;
+        }
+    
+        .theme-toggle:hover svg {
+            transform: rotate(90deg);
+        }
+    
+        [data-theme="dark"] .theme-toggle svg {
+            transform: rotate(40deg);
+        }
+    
+        .patreon-button:hover svg {
+            stroke: var(--accent-color);
+        }
+    
+        @media (max-width: 768px) {
+            .share-button,
+            .patreon-button,
+            .theme-toggle {
+                padding: 0.4rem;
+            }
+            
+            .share-button svg,
+            .patreon-button svg,
+            .theme-toggle svg {
+                width: 20px;
+                height: 20px;
+            }
+        }
+    
+    
+        .feedback-toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            padding: 0.5rem 1rem;
+            background: var(--accent-color);
+            color: white;
+            border-radius: 4px;
+            opacity: 0;
+            transform: translateY(1rem);
+            transition: all 0.3s ease;
+        }
+    
+        .feedback-toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    
+        .export-menu {
+            position: fixed;
+            Left: 5rem;
+            bottom: 4rem;
+            color: var(--text-menu-color);
+            background:var(--accent-color);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 0.5rem;
+            display: none;
+            flex-direction: column;
+            gap: 0.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+    
+        .export-menu.show {
+            display: flex;
+        }
+    
+        .export-menu button {
+            background: none;
+            border: none;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            color: var(--text-color);
+            text-align: left;
+            transition: background-color 0.2s;
+        }
+    
+        .export-menu button:hover {
+            background-color: var(--hover-color);
+        }
+    
+        .export-button {
+            position: fixed;
+            left: 1.2rem;
+            bottom: 9.6rem;
+            background: none;
+            border: none;
+            padding: 0.5rem;
+            cursor: pointer;
+            color: var(--text-color);
+            opacity: 0.7;
+            transition: all 0.3s ease;
+        }
+    
+        .export-button:hover {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+    
+        /* === Regla añadida para unificar el color de todos los botones === */
+        button,
+        .toolbar button,
+        .document-item button,
+        .welcome-message button,
+        .format-menu button,
+        #newDocument,
+        .share-popup button,
+        .theme-toggle,
+        .patreon-button,
+        .share-button,
+        .export-button {
+            color: #68696a; /* Cambia este valor al color deseado para los botones */
+            background-color: transparent; /* Cambia si deseas un color de fondo específico */
+        }
+        /* === Fin de la regla añadida === */
     </style>
+    
 </head>
 <body>
     <div class="container">
         <div class="toolbar">
             <button id="menuToggle" title="Menú" aria-label="Abrir menú">≡</button>
+            <button class="export-button" id="exportButton" title="Exportar documento" aria-label="Exportar documento">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="7 10 12 15 17 10"/>
+                    <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+            </button>
         </div>
 
         <div class="editor-container">
@@ -438,7 +610,13 @@
             <button id="newDocument" title="Nuevo documento">+</button>
         </div>
 
-        <button class="share-button" id="shareButton" title="Compartir MuType" aria-label="Compartir MuType">⇱</button>
+        <button class="share-button" id="shareButton" title="Compartir Mutxt" aria-label="Compartir Mutxt">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
+                <polyline points="16 6 12 2 8 6"/>
+                <line x1="12" y1="2" x2="12" y2="15"/>
+            </svg>
+        </button>
         <div class="overlay" id="shareOverlay"></div>
         <div class="share-popup" id="sharePopup">
             <p>Un lugar para escribir con claridad. Sin ruido, solo tú y tu creatividad.</p>
@@ -446,13 +624,22 @@
                 <button id="copyShareLink">Copiar</button>
             </div>
         </div>
-        <a href="https://www.patreon.com/tuusuario" target="_blank" class="patreon-button" title="Apoyar en Patreon" aria-label="Apoyar en Patreon">♥︎</a>
-        <button class="theme-toggle" id="themeToggle" title="Cambiar tema" aria-label="Cambiar tema">◐</button>
+        <a href="https://www.patreon.com/tuusuario" target="_blank" class="patreon-button" title="Apoyar en Patreon" aria-label="Apoyar en Patreon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+            </svg>
+        </a>
+        <button class="theme-toggle" id="themeToggle" title="Cambiar tema" aria-label="Cambiar tema">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="5"/>
+                <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+            </svg>
+        </button>
     </div>
 
     <div class="welcome-message" id="welcomeMessage">
-        <h1>Bienvenido a MuType</h1>
-        <p>MuType es un editor de texto minimalista que te permite escribir sin distracciones.</p>
+        <h1>Bienvenido a Mutxt</h1>
+        <p>Mutxt es un editor de texto minimalista que te permite escribir sin distracciones.</p>
         <p>Características principales:</p>
         <ul>
             <li>Soporte para Markdown</li>
@@ -465,19 +652,25 @@
         <button id="closeWelcome">Comenzar a escribir</button>
     </div>
 
+    <div class="export-menu" id="exportMenu">
+        <button data-format="txt">Texto plano (.txt)</button>
+        <button data-format="md">Markdown (.md)</button>
+        <button data-format="html">HTML (.html)</button>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script>
 
         const translations = {
             es: {
-                title: 'MuType',
+                title: 'Mutxt',
                 placeholder: 'Empieza a escribir...',
                 titlePlaceholder: 'Título del documento',
                 wordCount: 'palabras',
                 charCount: 'caracteres',
                 welcome: {
-                    title: 'Bienvenido a MuType',
-                    description: 'MuType es un editor de texto minimalista que te permite escribir sin distracciones.',
+                    title: 'Bienvenido a Mutxt',
+                    description: 'Mutxt es un editor de texto minimalista que te permite escribir sin distracciones.',
                     features: 'Características principales:',
                     featuresList: [
                         'Soporte para Markdown',
@@ -493,25 +686,25 @@
                     message: 'Un lugar para escribir con claridad. Sin ruido, solo tú y tu creatividad.',
                     copyButton: 'Copiar',
                     copied: '¡Copiado!',
-                    thanks: 'Gracias por apoyar MuType y la escritura sin distracciones.'
+                    thanks: 'Gracias por apoyar Mutxt y la escritura sin distracciones.'
                 },
                 buttons: {
                     menu: 'Menú',
                     theme: 'Cambiar tema',
-                    share: 'Compartir MuType',
+                    share: 'Compartir Mutxt',
                     support: 'Apoyar en Patreon',
                     newDoc: 'Nuevo documento'
                 }
             },
             en: {
-                title: 'MuType',
+                title: 'Mutxt',
                 placeholder: 'Start writing...',
                 titlePlaceholder: 'Document title',
                 wordCount: 'words',
                 charCount: 'characters',
                 welcome: {
-                    title: 'Welcome to MuType',
-                    description: 'MuType is a minimalist text editor that lets you write without distractions.',
+                    title: 'Welcome to Mutxt',
+                    description: 'Mutxt is a minimalist text editor that lets you write without distractions.',
                     features: 'Main features:',
                     featuresList: [
                         'Markdown support',
@@ -527,12 +720,12 @@
                     message: 'A place to write with clarity. No noise, just you and your creativity.',
                     copyButton: 'Copy',
                     copied: 'Copied!',
-                    thanks: 'Thank you for supporting MuType and distraction-free writing.'
+                    thanks: 'Thank you for supporting Mutxt and distraction-free writing.'
                 },
                 buttons: {
                     menu: 'Menu',
                     theme: 'Toggle theme',
-                    share: 'Share MuType',
+                    share: 'Share Mutxt',
                     support: 'Support on Patreon',
                     newDoc: 'New document'
                 }
@@ -540,7 +733,7 @@
         };
 
         function getPreferredLanguage() {
-            const savedLang = localStorage.getItem('mutype-language');
+            const savedLang = localStorage.getItem('mutxt-language');
             if (savedLang) return savedLang;
             
             const browserLang = navigator.language.split('-')[0];
@@ -595,7 +788,7 @@
         const menuToggle = document.getElementById('menuToggle');
 
         function loadDocuments() {
-            const savedDocuments = localStorage.getItem('zenwrite-documents');
+            const savedDocuments = localStorage.getItem('mutxt-documents');
             if (savedDocuments) {
                 documents = JSON.parse(savedDocuments);
                 renderDocumentsList();
@@ -603,7 +796,7 @@
         }
 
         function saveDocuments() {
-            localStorage.setItem('zenwrite-documents', JSON.stringify(documents));
+            localStorage.setItem('mutxt-documents', JSON.stringify(documents));
         }
 
         function renderDocumentsList() {
@@ -713,7 +906,7 @@
             document.documentElement.setAttribute('data-theme',
                 document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'
             );
-            localStorage.setItem('zenwrite-theme', document.documentElement.getAttribute('data-theme'));
+            localStorage.setItem('mutxt-theme', document.documentElement.getAttribute('data-theme'));
         });
 
         editor.addEventListener('input', () => {
@@ -826,7 +1019,7 @@
         });
 
         document.addEventListener('DOMContentLoaded', () => {
-            const savedTheme = localStorage.getItem('zenwrite-theme') || 'light';
+            const savedTheme = localStorage.getItem('mutxt-theme') || 'light';
             document.documentElement.setAttribute('data-theme', savedTheme);
 
             loadDocuments();
@@ -837,15 +1030,67 @@
                 loadDocument(documents[0].id);
             }
 
-            if (!localStorage.getItem('zenwrite-welcomed')) {
+            if (!localStorage.getItem('mutxt-welcomed')) {
                 welcomeMessage.style.display = 'block';
-                localStorage.setItem('zenwrite-welcomed', 'true');
+                localStorage.setItem('mutxt-welcomed', 'true');
             } else {
                 welcomeMessage.style.display = 'none';
             }
 
             const lang = getPreferredLanguage();
             updateUILanguage(lang);
+
+            const exportButton = document.getElementById('exportButton');
+            const exportMenu = document.getElementById('exportMenu');
+            const focusModeButton = document.getElementById('focusModeButton');
+            const editorContainer = document.querySelector('.editor-container');
+
+            if (exportButton && exportMenu) {
+                exportButton.addEventListener('click', () => {
+                    exportMenu.classList.toggle('show');
+                });
+
+                document.addEventListener('click', (e) => {
+                    if (!exportButton.contains(e.target) && !exportMenu.contains(e.target)) {
+                        exportMenu.classList.remove('show');
+                    }
+                });
+
+                exportMenu.addEventListener('click', (e) => {
+                    if (e.target.tagName === 'BUTTON') {
+                        const format = e.target.dataset.format;
+                        const content = editor.innerText;
+                        const title = documentTitle.value || 'documento';
+                        
+                        switch(format) {
+                            case 'txt':
+                                downloadFile(`${title}.txt`, content, 'text/plain');
+                                break;
+                            case 'md':
+                                downloadFile(`${title}.md`, content, 'text/markdown');
+                                break;
+                            case 'html':
+                                const htmlContent = marked(content);
+                                downloadFile(`${title}.html`, htmlContent, 'text/html');
+                                break;
+                        }
+                        exportMenu.classList.remove('show');
+                    }
+                });
+            }
+
+            if (focusModeButton && editorContainer) {
+                focusModeButton.addEventListener('click', () => {
+                    editorContainer.classList.toggle('focus-mode');
+                    focusModeButton.classList.toggle('active');
+                    
+                    if (editorContainer.classList.contains('focus-mode')) {
+                        showTemporaryFeedback('Modo enfoque activado');
+                    } else {
+                        showTemporaryFeedback('Modo enfoque desactivado');
+                    }
+                });
+            }
         });
 
         editor.addEventListener('input', updateWordCount);
@@ -894,6 +1139,81 @@
             document.getElementById('shareOverlay').classList.remove('active');
             document.getElementById('sharePopup').classList.remove('active');
         });
+
+        function exportDocument(format) {
+            const content = editor.innerText;
+            const title = documentTitle.value || 'documento';
+            
+            switch(format) {
+                case 'txt':
+                    downloadFile(`${title}.txt`, content, 'text/plain');
+                    break;
+                case 'md':
+                    downloadFile(`${title}.md`, content, 'text/markdown');
+                    break;
+                case 'html':
+                    const htmlContent = marked(content);
+                    downloadFile(`${title}.html`, htmlContent, 'text/html');
+                    break;
+            }
+        }
+
+        const exportButton = document.getElementById('exportButton');
+        const exportMenu = document.getElementById('exportMenu');
+
+        exportButton.addEventListener('click', () => {
+            exportMenu.classList.toggle('show');
+        });
+
+        function downloadFile(filename, content, type) {
+            const blob = new Blob([content], { type: type });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            window.URL.revokeObjectURL(url);
+            
+            showTemporaryFeedback('Documento exportado');
+        }
+
+        exportMenu.addEventListener('click', (e) => {
+            if (e.target.tagName === 'BUTTON') {
+                const format = e.target.dataset.format;
+                const content = editor.innerText;
+                const title = documentTitle.value || 'documento';
+                
+                switch(format) {
+                    case 'txt':
+                        downloadFile(`${title}.txt`, content, 'text/plain');
+                        break;
+                    case 'md':
+                        downloadFile(`${title}.md`, content, 'text/markdown');
+                        break;
+                    case 'html':
+                        const htmlContent = marked(content);
+                        downloadFile(`${title}.html`, htmlContent, 'text/html');
+                        break;
+                }
+                exportMenu.classList.remove('show');
+            }
+        });
+
+        function showTemporaryFeedback(message) {
+            const feedback = document.createElement('div');
+            feedback.className = 'feedback-toast';
+            feedback.textContent = message;
+            document.body.appendChild(feedback);
+            
+            setTimeout(() => {
+                feedback.classList.add('show');
+            }, 100);
+            
+            setTimeout(() => {
+                feedback.classList.remove('show');
+                setTimeout(() => feedback.remove(), 300);
+            }, 2000);
+        }
     </script>
 </body>
 </html>
