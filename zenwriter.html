@@ -110,16 +110,22 @@
             caret-color: var(--cursor-color);
         }
     
-        .word-counter {
-            position: fixed;
-            bottom: 5rem;
+       position: fixed;
+            bottom: 1rem;
             right: 1rem;
             font-size: 0.8rem;
-            color: var(--toolbar-color);
+            color: var(--text-color);
             background: var(--bg-color);
             padding: 0.5rem 1rem;
-            opacity: 0.7;
-            z-index: 1000;
+            border-radius: 20px;
+            opacity: 0.9;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: opacity 0.3s ease;
+        }
+
+        .word-counter:hover {
+            opacity: 1;
         }
     
         .editor:focus, .document-title:focus {
