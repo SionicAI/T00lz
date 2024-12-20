@@ -3,53 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Dopamine Tasks - Gestiona tus tareas con el método Pomodoro">
+    <meta name="theme-color" content="#ffffff">
+    
+    <!-- Mejoras SEO -->
+    <meta name="keywords" content="pomodoro, tasks, productivity, time management">
+    <meta property="og:title" content="Dopamine Tasks">
+    <meta property="og:description" content="Task management with Pomodoro technique">
+    
+    <!-- Precarga de recursos críticos -->
+    <link rel="preload" href="dopaminestyle.css" as="style">
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500&display=swap" as="font" crossorigin>
+    
     <title>Dopamine Tasks</title>
     <link rel="stylesheet" href="dopaminestyle.css">
+    
+    <!-- PWA support -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon-192.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="container">
+    <header class="app-header" role="banner">
+        
+    </header>
+
+    <main class="container" role="main">
         <div class="tasks-container">
-            <div class="tasks-header">
-                <div class="group-selector">
-                    <select id="groupSelect" class="group-select">
-                        <!-- Grupos se agregarán dinámicamente -->
-                    </select>
-                    <div class="group-actions">
-                        <button class="icon-btn add-group-btn" title="Nuevo grupo">+</button>
-                        <button class="icon-btn edit-group-btn" title="Editar grupo">✎</button>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="pomodoro-section">
+
+             <!-- Mejora de accesibilidad en el Pomodoro -->
+             <section class="pomodoro-section" aria-labelledby="pomodoro-title">
                 <div class="pomodoro-header">
-                    <button class="toggle-pomodoro">
-                        <span class="arrow">▸</span> Pomodoro Timer
+                    <button class="toggle-pomodoro" aria-expanded="false">
+                        <span class="arrow" aria-hidden="true">▸</span>
+                        <span id="pomodoro-title">Pomodoro Timer</span>
                     </button>
                 </div>
                 
-                <div class="pomodoro-content">
-                    <div class="timer-display">
+                <div class="pomodoro-content" role="timer">
+                    <div class="timer-display" aria-live="polite">
                         <span id="minutes">25</span>:<span id="seconds">00</span>
                     </div>
                     
-                    <div class="timer-modes">
-                        <button class="timer-mode active" data-mode="work" data-time="25">Trabajo</button>
-                        <button class="timer-mode" data-mode="break" data-time="5">Descanso</button>
-                        <button class="timer-mode" data-mode="long" data-time="15">Descanso Largo</button>
+                    <div class="timer-modes" role="radiogroup" aria-label="Modos de temporizador">
+                        <button class="timer-mode active" data-mode="work" data-time="25" aria-pressed="true">Trabajo</button>
+                        <button class="timer-mode" data-mode="break" data-time="5" aria-pressed="false">Descanso</button>
+                        <button class="timer-mode" data-mode="long" data-time="15" aria-pressed="false">Descanso Largo</button>
                     </div>
                     
                     <div class="timer-controls">
-                        <button id="startTimer" class="timer-control">
-                            <svg viewBox="0 0 24 24" class="timer-icon">
+                        <button id="startTimer" class="timer-control" aria-label="Iniciar temporizador">
+                            <svg viewBox="0 0 24 24" class="timer-icon" aria-hidden="true">
                                 <path d="M8 5v14l11-7z"/>
                             </svg>
                         </button>
-                        <button id="pauseTimer" class="timer-control">
-                            <svg viewBox="0 0 24 24" class="timer-icon">
+                        <button id="pauseTimer" class="timer-control" aria-label="Pausar temporizador">
+                            <svg viewBox="0 0 24 24" class="timer-icon" aria-hidden="true">
                                 <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
                             </svg>
                         </button>
@@ -60,11 +71,29 @@
                         </button>
                     </div>
                 </div>
+            </section>
+            
+            <!-- Mejora de accesibilidad en el selector -->
+            <div class="tasks-header">
+                <div class="group-controls">
+                    <select id="groupSelect" class="group-select" aria-label="Seleccionar grupo">
+                        <!-- Groups will be added dynamically -->
+                    </select>
+                    <div class="group-buttons">
+                        <button class="icon-btn add-group-btn" aria-label="Agregar grupo">
+                            <span aria-hidden="true">+</span>
+                        </button>
+                        <button class="icon-btn edit-group-btn" aria-label="Editar grupo">
+                            <span aria-hidden="true">✎</span>
+                        </button>
+                    </div>
+                </div>
             </div>
             
+           
+            
             <div class="add-task">
-                <input type="text" id="newTaskInput" placeholder="Nueva tarea...">
-                <button class="add-task-btn">+</button>
+                <input type="text" id="newTask" placeholder="Agregar nueva tarea..." aria-label="Nueva tarea">
             </div>
 
             <div class="tasks-list" id="tasksList">
@@ -87,7 +116,13 @@
                 <button class="theme-toggle" title="Cambiar tema">🌙</button>
             </div>
         </div>
-    </div>
+    </main>
+
+    <noscript>
+        <div class="noscript-message">
+            Esta aplicación requiere JavaScript para funcionar correctamente.
+        </div>
+    </noscript>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
     <script src="dopaminescript.js"></script>
 </body>
