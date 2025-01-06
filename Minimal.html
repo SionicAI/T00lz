@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Minimal Habit Tracker</title>
+  <!-- Fuente "Noto Sans" -->
+  <link rel="preconnect" href="https://fonts.gstatic.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans&display=swap" rel="stylesheet" />
+
+  <style>
+    /* 
+      ============================
+         VARIABLES DE COLOR
+      ============================
+    */
+    :root {
+      --bg-color: #ffffff;
+      --text-color: #000000;
+      --subtle-color: #f0f0f0;
+      --highlight-color: #588453; /* Color vibrante para indicadores */
+      --missed-color: #ff3b3b;    /* Casillas sin marcar cuando pasa el día */
+      --completed-color: #6fcf97; /* Color para hábitos completados */
+      --circle-size: 14px;
+      --view-text: #333333;
+      --view-text-active: #000000;
+      --view-bg: #ffffff;
+      --view-border: #dddddd;
+    }
+
+    /* Modo oscuro */
+    .dark-mode {
+      --bg-color: #1b1b1b;
+      --text-color: #ffffff;
+      --subtle-color: #2b2b2b;
+      --highlight-color: #b9d368;
+      --missed-color: #ff6767;
+      --completed-color: #69f0ae;
+    }
+
+    .dark {
+      --view-text: #e0e0e0;
+      --view-text-active: #ffffff;
+      --view-bg: #2d2d2d;
+      --view-border: #404040;
+    }
+
+    /* 
+      ============================
+        RESETEO Y ESTILOS BASE
+      ============================
+    */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Noto Sans', sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      padding: 1rem;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    h1 {
+      margin-bottom: 1rem;
+      font-size: 1.5rem;
+      text-align: center;
+    }
+
+    button, select {
+      font-family: 'Noto Sans', sans-serif;
+      cursor: pointer;
+      outline: none;
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    /* 
+      ============================
+          CONTENEDOR PRINCIPAL
+      ============================
+    */
+    .habit-tracker-container {
+      max-width: 720px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    /* 
+      ============================
+         CONTROLES SUPERIORES
+      ============================
+    */
+    .top-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .view-selector {
+      position: relative;
+      display: inline-block;
+    }
+
+    .view-dropdown-btn {
+      background: var(--view-bg);
+      color: var(--view-text);
+      border: 1px solid var(--view-border);
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s ease;
+    }
+
+    .view-dropdown-content {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      background: var(--view-bg);
+      min-width: 160px;
+      border-radius: 6px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-10px);
+      transition: all 0.2s ease;
+      z-index: 100;
+    }
+
+    .view-dropdown-content.show {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .view-dropdown-content button {
+      width: 100%;
+      text-align: left;
+      padding: 0.5rem 1rem;
+      border: none;
+      background: none;
+      color: var(--view-text);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .view-dropdown-content button:hover {
+      background: var(--subtle-color);
+    }
+
+    .view-dropdown-content button.active {
+      background: var(--accent-color);
+      color: white;
+    }
+
+    /* Contenedor del toggle de modo oscuro */
+    .dark-mode-toggle {
+      background: none;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      transition: color 0.3s;
+    }
+
+    /* Ajuste para el contenedor de iconos */
+    #darkModeIcon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      color: var(--text-color);
+      transition: color 0.3s;
+    }
+
+    /* Iconos en SVG */
+    #iconMoon, #iconSun {
+      width: 24px;
+      height: 24px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    #iconMoon {
+      display: none; /* Se muestra solo cuando está activado el modo oscuro */
+    }
+
+    /*
+      ============================
+       BOTÓN PARA AGREGAR HÁBITOS
+      ============================
+    */
+    .add-habit-btn {
+      background: var(--view-border);;
+      border: 1px groove var(--view-border);
+      border-radius: 4px;
+      padding: 0.2rem 0.6rem;
+      font-size: 1.2rem;
+      line-height: 1;
+      transition: background-color 0.2s, color 0.2s;
+    }
+
+    .add-habit-btn:hover {
+      background-color: var(--highlight-color);
+      color: #fff;
+      border-color: var(--highlight-color);
+    }
+
+    /*
+      ============================
+          TABLA DIARIA/SEMANAL
+      ============================
+    */
+    .daily-weekly-view {
+  overflow-x: auto;
+  border-radius: 8px; /* Esquinas redondeadas para el contenedor */
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 0.5rem;
+  min-width: 400px;
+  overflow-x: auto;
+  border-radius: 8px; /* Esquinas redondeadas para la tabla */
+  overflow: hidden; /* Asegura que el contenido interno respete las esquinas redondeadas */
+}
+
+thead {
+  background-color: var(--subtle-color);
+  /*border-radius: 8px 8px 0 0;*/ /* Esquinas redondeadas solo en la parte superior */
+}
+
+th, td {
+  text-align: center; /* Centra el texto horizontalmente */
+  padding: 0.5rem;
+  /*border: 1px dotted var(--view-border);/
+  vertical-align: middle; /* Centra el contenido verticalmente */
+}
+
+/* Contenedor para el nombre del hábito y botón de borrado */
+.habit-name-container {
+  display: flex;
+  align-items: center;
+  justify-content: center; /* Alinea el contenido a la izquierda */
+  gap: 0.5rem;
+  position: relative;
+  border-radius: 8px; /* Esquinas redondeadas para el contenedor */
+  padding-left: 1rem; /* Añade un padding para alinear con el título */
+}
+
+.habit-name-container span {
+  cursor: pointer;
+}
+
+/* Botón para eliminar hábito en la tabla */
+.delete-habit-btn {
+  background: none;
+  border: none;
+  padding: 0.1rem 0.3rem;
+  font-size: 0.8rem;
+  line-height: 1;
+  opacity: 0; /* Aparece al hacer hover */
+  transition: opacity 0.2s, background-color 0.2s, color 0.2s;
+  cursor: pointer;
+}
+
+.habit-name-container:hover .delete-habit-btn {
+  opacity: 1;
+}
+
+.delete-habit-btn:hover {
+  background-color: var(--missed-color);
+  color: #fff;
+  border-color: var(--missed-color);
+}
+
+/* Indicador circular (vista diaria y semanal) */
+.indicator {
+  width: var(--circle-size);
+  height: var(--circle-size);
+  border-radius: 50%;
+  margin: 0 auto;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  border: 0.5px solid var(--view-border);
+}
+
+.indicator.completed {
+  background-color: var(--completed-color);
+}
+
+.indicator.missed {
+  background-color: var(--missed-color);
+}
+    /*
+      ============================
+         VISTA MENSUAL/ANUAL
+      ============================
+    */
+    .calendar-view {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .habit-selector {
+      display: flex;
+      justify-content: flex-start;
+      gap: 0.5rem;
+      align-items: center;
+    }
+
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 40px);
+      gap: 0.5rem;
+      justify-content: center;
+      margin-top: 0.5rem;
+    }
+
+    .month-label {
+      grid-column: span 7;
+      text-align: center;
+      font-weight: bold;
+      margin-top: 1rem;
+    }
+
+    .calendar-day {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background-color: var(--subtle-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background-color 0.2s;
+      text-align: center;
+    }
+
+    .calendar-day.selected {
+      background-color: var(--highlight-color);
+      color: #fff;
+    }
+
+    .calendar-day:hover {
+      background-color: var(--highlight-color);
+      color: #fff;
+    }
+
+    .day-indicator {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .day-indicator.completed {
+      background-color: var(--completed-color);
+    }
+    .day-indicator.missed {
+      background-color: var(--missed-color);
+      color: #fff;
+    }
+
+    /*
+      ============================
+          BOTÓN A PATREON
+      ============================
+    */
+    .patreon-button {
+      position: fixed;
+      bottom: 1rem;
+      right: 1rem;
+      width: 48px;
+      height: 48px;
+      background-color:#bebcbc;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      transition: background-color 0.3s;
+    }
+    .patreon-button:hover {
+      background-color: #ff3b3b; /* Rojo vivo */
+    }
+    .patreon-button svg {
+      width: 24px;
+      height: 24px;
+      stroke: var(--bg-color);
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .patreon-btn {
+      position: fixed;
+      left: 20px; /* Cambiado de right a left */
+      bottom: 20px;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: #fff;
+      display: flex;
+      align-items: left;
+      justify-content: center;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 1000;
+    }
+
+    .patreon-btn svg {
+      width: 24px;
+      height: 24px;
+      transition: all 0.3s ease;
+    }
+
+    .patreon-btn:hover {
+      transform: scale(1.1);
+      background: #ff0000; /* Rojo vivo */
+      box-shadow: 0 4px 15px rgba(255, 0, 0, 0.3);
+    }
+
+    .patreon-btn:hover svg {
+      fill: #ffffff;
+      transform: scale(1.2);
+    }
+
+    /* Soporte modo oscuro */
+    .dark .patreon-btn {
+      background: #2d2d2d;
+    }
+
+    .dark .patreon-btn svg {
+      fill: #ffffff;
+    }
+
+  </style>
+</head>
+<body>
+  <div class="habit-tracker-container">
+    <h1>Habit Tracker Minimalista</h1>
+    
+    <!-- Controles superiores: vista y modo oscuro -->
+    <div class="top-controls">
+      <div class="view-selector">
+        <button class="view-dropdown-btn">
+          <span class="selected-view">Vista Diaria</span>
+          <svg width="12" height="12" viewBox="0 0 12 12">
+            <path d="M2 4l4 4 4-4" stroke="currentColor" fill="none" stroke-width="2"/>
+          </svg>
+        </button>
+        <div class="view-dropdown-content">
+          <button data-view="daily" class="active">Diaria</button>
+          <button data-view="weekly">Semanal</button>
+          <button data-view="monthly">Mensual</button>
+          <button data-view="yearly">Anual</button>
+        </div>
+      </div>
+      <!-- Botón modo oscuro/claro con SVG minimalistas -->
+      <button class="dark-mode-toggle" id="toggleDarkMode">
+        <div id="darkModeIcon">
+          <!-- Icono de Sol (modo claro) -->
+          <svg id="iconSun" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+          <!-- Icono de Luna (modo oscuro) -->
+          <svg id="iconMoon" viewBox="0 0 24 24">
+            <path d="M21 12.79A9 9 0 1111.21 3a7 7 0 0010.58 9.79z"></path>
+          </svg>
+        </div>
+      </button>
+    </div>
+
+    <!-- Botón para agregar nuevos hábitos -->
+    <button class="add-habit-btn" id="addHabitBtn">+</button>
+
+    <!-- Contenedor para la vista diaria/semanal -->
+    <div id="dailyWeeklyView" class="daily-weekly-view">
+      <table>
+        <thead>
+          <tr id="dailyWeeklyHeader">
+            <th>Hábito</th>
+            <!-- Las columnas para días se generan dinámicamente -->
+          </tr>
+        </thead>
+        <tbody id="dailyWeeklyBody">
+          <!-- Las filas (hábitos) se generan dinámicamente -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Contenedor para la vista mensual/anual -->
+    <div id="calendarView" class="calendar-view" style="display: none;">
+      <div class="habit-selector">
+        <label for="habitSelect">Hábito:</label>
+        <select id="habitSelect">
+          <!-- Opciones generadas dinámicamente -->
+        </select>
+      </div>
+      <div class="calendar-grid" id="calendarGrid">
+        <!-- Días generados dinámicamente -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Botón flotante con icono de corazón para Patreon -->
+  <a href="https://patreon.com/simplici_" target="_blank" class="patreon-button" aria-label="Apóyame en Patreon">
+    <svg viewBox="0 0 24 24">
+      <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/>
+    </svg>
+  </a>
+
+  <script>
+    /* 
+      ============================
+        LÓGICA DEL TRACKER
+      ============================
+    */
+
+    // --------- VARIABLES GLOBALES ---------
+    const habitsKey = 'minimalHabitTrackerData';
+    let habitData = JSON.parse(localStorage.getItem(habitsKey)) || [];
+    let currentView = 'daily';
+    let isDarkMode = false;
+
+    // Elementos del DOM
+    const addHabitBtn = document.getElementById('addHabitBtn');
+    const dailyWeeklyViewEl = document.getElementById('dailyWeeklyView');
+    const calendarViewEl = document.getElementById('calendarView');
+    const dailyWeeklyHeader = document.getElementById('dailyWeeklyHeader');
+    const dailyWeeklyBody = document.getElementById('dailyWeeklyBody');
+    const calendarGrid = document.getElementById('calendarGrid');
+    const habitSelect = document.getElementById('habitSelect');
+    const viewSelectorButtons = document.querySelectorAll('.view-selector button');
+    const toggleDarkModeBtn = document.getElementById('toggleDarkMode');
+    const iconSun = document.getElementById('iconSun');
+    const iconMoon = document.getElementById('iconMoon');
+
+    // --------- INICIALIZACIÓN ---------
+    init();
+
+    function init() {
+      updateView();
+      renderDarkMode();
+    }
+
+    // --------- VISTAS ---------
+    viewSelectorButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        viewSelectorButtons.forEach(b => b.classList.remove('active'));
+        button.classList.add('active');
+        currentView = button.dataset.view;
+        updateView();
+      });
+    });
+
+    function updateView() {
+      if (currentView === 'daily' || currentView === 'weekly') {
+        dailyWeeklyViewEl.style.display = 'block';
+        calendarViewEl.style.display = 'none';
+        renderDailyWeeklyTable();
+      } else {
+        dailyWeeklyViewEl.style.display = 'none';
+        calendarViewEl.style.display = 'flex';
+        renderCalendar(currentView);
+        updateHabitSelect();
+      }
+    }
+
+    // --------- AGREGAR NUEVO HÁBITO ---------
+    addHabitBtn.addEventListener('click', () => {
+      const habitName = prompt('Nombre del nuevo hábito:');
+      if (habitName && habitName.trim() !== '') {
+        const newHabit = {
+          id: Date.now(),
+          name: habitName.trim(),
+          // Los registros se guardan por fecha
+          records: {} // { 'YYYY-MM-DD': 'completed' | undefined }
+        };
+        habitData.push(newHabit);
+        saveData();
+        updateView();
+      }
+    });
+
+    // --------- TABLA DIARIA/SEMANAL ---------
+    function renderDailyWeeklyTable() {
+      // Limpiar encabezados y cuerpo
+      while (dailyWeeklyHeader.children.length > 1) {
+        dailyWeeklyHeader.removeChild(dailyWeeklyHeader.lastChild);
+      }
+      dailyWeeklyBody.innerHTML = '';
+
+      // Crear las columnas de la fecha
+      const today = new Date();
+      let datesToShow = [today];
+
+      if (currentView === 'weekly') {
+        datesToShow = getLast7Days();
+      }
+
+      // Añadir celdas de encabezado para cada día
+      datesToShow.forEach(date => {
+        const th = document.createElement('th');
+        th.textContent = formatDate(date);
+        dailyWeeklyHeader.appendChild(th);
+      });
+
+      // Rellenar la tabla con filas de hábitos
+      habitData.forEach(habit => {
+        const tr = document.createElement('tr');
+
+        // Celda de nombre de hábito + opciones
+        const habitNameTd = document.createElement('td');
+        const nameContainer = document.createElement('div');
+        nameContainer.classList.add('habit-name-container');
+
+        // Span para el nombre (edición al hacer clic)
+        const nameSpan = document.createElement('span');
+        nameSpan.textContent = habit.name;
+        nameSpan.addEventListener('click', () => {
+          const newName = prompt('Editar nombre del hábito:', habit.name);
+          if (newName !== null && newName.trim() !== '') {
+            habit.name = newName.trim();
+            saveData();
+            renderDailyWeeklyTable();
+          }
+        });
+
+        // Botón para eliminar el hábito
+        const deleteBtn = document.createElement('button');
+        deleteBtn.classList.add('delete-habit-btn');
+        deleteBtn.textContent = 'x';
+        deleteBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          if (confirm('¿Eliminar este hábito?')) {
+            habitData = habitData.filter(h => h.id !== habit.id);
+            saveData();
+            updateView();
+          }
+        });
+
+        nameContainer.appendChild(nameSpan);
+        nameContainer.appendChild(deleteBtn);
+        habitNameTd.appendChild(nameContainer);
+        tr.appendChild(habitNameTd);
+
+        // Para cada día, crear un indicador
+        datesToShow.forEach(date => {
+          const td = document.createElement('td');
+          const indicator = document.createElement('div');
+          indicator.classList.add('indicator');
+
+          const dateKey = dateToKey(date);
+          if (habit.records[dateKey] === 'completed') {
+            indicator.classList.add('completed');
+          } else if (isPastDate(date) && !habit.records[dateKey]) {
+            indicator.classList.add('missed');
+          }
+
+          indicator.addEventListener('click', () => {
+            toggleHabitStatus(habit, dateKey);
+            renderDailyWeeklyTable();
+          });
+
+          td.appendChild(indicator);
+          tr.appendChild(td);
+        });
+
+        dailyWeeklyBody.appendChild(tr);
+      });
+    }
+
+    // --------- CALENDARIO MENSUAL/ANUAL ---------
+    function renderCalendar(view) {
+      calendarGrid.innerHTML = '';
+
+      const date = new Date();
+      let month = date.getMonth();
+      let year = date.getFullYear();
+
+      if (view === 'monthly') {
+        // Renderizar solo el mes actual
+        renderSingleMonth(year, month);
+      } else if (view === 'yearly') {
+        // Renderizar los 12 meses del año
+        for (let m = 0; m < 12; m++) {
+          const monthLabel = document.createElement('div');
+          monthLabel.textContent = new Date(year, m).toLocaleString('default', { month: 'long' }) + ' ' + year;
+          monthLabel.classList.add('month-label');
+          calendarGrid.appendChild(monthLabel);
+
+          renderSingleMonth(year, m);
+        }
+      }
+    }
+
+    function renderSingleMonth(year, month) {
+      const weekDays = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
+      weekDays.forEach(day => {
+        const header = document.createElement('div');
+        header.textContent = day;
+        header.style.fontWeight = 'bold';
+        header.style.textAlign = 'center';
+        calendarGrid.appendChild(header);
+      });
+
+      // Primer día del mes
+      const firstDay = new Date(year, month, 1);
+      const lastDay = new Date(year, month + 1, 0);
+
+      // Ajustar espacio antes del primer día (para empezar lunes = 0)
+      const startDay = firstDay.getDay(); // domingo=0, lunes=1...
+      const offset = (startDay + 6) % 7;
+
+      for (let i = 0; i < offset; i++) {
+        const emptyCell = document.createElement('div');
+        calendarGrid.appendChild(emptyCell);
+      }
+
+      // Días del mes
+      for (let d = 1; d <= lastDay.getDate(); d++) {
+        const dayDate = new Date(year, month, d);
+        const dayCell = document.createElement('div');
+        dayCell.classList.add('calendar-day');
+
+        dayCell.addEventListener('click', () => {
+          // Quitar la clase 'selected' de todos
+          document.querySelectorAll('.calendar-day').forEach(cd => cd.classList.remove('selected'));
+          dayCell.classList.add('selected');
+        });
+
+        const dayIndicator = document.createElement('div');
+        dayIndicator.classList.add('day-indicator');
+
+        // Estado del hábito seleccionado
+        const selectedHabitId = parseInt(habitSelect.value || -1, 10);
+        const selectedHabit = habitData.find(h => h.id === selectedHabitId);
+        if (selectedHabit) {
+          const dateKey = dateToKey(dayDate);
+          if (selectedHabit.records[dateKey] === 'completed') {
+            dayIndicator.classList.add('completed');
+          } else if (isPastDate(dayDate) && !selectedHabit.records[dateKey]) {
+            dayIndicator.classList.add('missed');
+          }
+
+          // Toggle al hacer clic
+          dayCell.addEventListener('click', () => {
+            toggleHabitStatus(selectedHabit, dateKey);
+            renderCalendar(currentView);
+          });
+        }
+
+        dayIndicator.textContent = d;
+        dayCell.appendChild(dayIndicator);
+        calendarGrid.appendChild(dayCell);
+      }
+    }
+
+    // Actualiza las opciones del selector según los hábitos
+    function updateHabitSelect() {
+      habitSelect.innerHTML = '';
+      habitData.forEach(habit => {
+        const option = document.createElement('option');
+        option.value = habit.id;
+        option.textContent = habit.name;
+        habitSelect.appendChild(option);
+      });
+    }
+
+    habitSelect.addEventListener('change', () => {
+      renderCalendar(currentView);
+    });
+
+    // --------- TOGGLE ESTADO HÁBITO ---------
+    function toggleHabitStatus(habit, dateKey) {
+      if (habit.records[dateKey] === 'completed') {
+        delete habit.records[dateKey];
+      } else {
+        habit.records[dateKey] = 'completed';
+      }
+      saveData();
+    }
+
+    // --------- UTILIDADES ---------
+    function getLast7Days() {
+      const dates = [];
+      const now = new Date();
+      for (let i = 6; i >= 0; i--) {
+        const d = new Date(now);
+        d.setDate(now.getDate() - i);
+        dates.push(d);
+      }
+      return dates;
+    }
+
+    function formatDate(date) {
+      return date.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
+    }
+
+    function dateToKey(date) {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+
+    function isPastDate(date) {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      return date < today;
+    }
+
+    function saveData() {
+      localStorage.setItem(habitsKey, JSON.stringify(habitData));
+    }
+
+    // --------- MODO OSCURO/CLARO ---------
+    toggleDarkModeBtn.addEventListener('click', () => {
+      isDarkMode = !isDarkMode;
+      renderDarkMode();
+    });
+
+    function renderDarkMode() {
+      if (isDarkMode) {
+        document.body.classList.add('dark-mode');
+        iconSun.style.display = 'none';
+        iconMoon.style.display = 'inline-block';
+      } else {
+        document.body.classList.remove('dark-mode');
+        iconSun.style.display = 'inline-block';
+        iconMoon.style.display = 'none';
+      }
+    }
+
+    // Add to your JavaScript
+    document.querySelector('.view-dropdown-btn').addEventListener('click', function() {
+      this.nextElementSibling.classList.toggle('show');
+    });
+
+    document.querySelectorAll('.view-dropdown-content button').forEach(button => {
+      button.addEventListener('click', function() {
+        const selectedView = this.textContent;
+        document.querySelector('.selected-view').textContent = selectedView;
+        document.querySelector('.view-dropdown-content').classList.remove('show');
+        
+        // Update active state
+        document.querySelectorAll('.view-dropdown-content button').forEach(btn => {
+          btn.classList.remove('active');
+        });
+        this.classList.add('active');
+      });
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(e) {
+      if (!e.target.closest('.view-selector')) {
+        document.querySelector('.view-dropdown-content').classList.remove('show');
+      }
+    });
+  </script>
+</body>
+</html>
