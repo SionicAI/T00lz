@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Frase Diaria</title>
+  <!-- Importar la fuente Lato desde Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    /* Variables de color para modos claro y oscuro */
+    :root {
+      --background: #f0f0f0;
+      --text: #333;
+      --widget-bg: #fff;
+      --author-text: #555;
+      --button-bg: transparent;
+      --button-text: #333;
+      --button-hover-bg: rgba(0, 0, 0, 0.05);
+      --button-active-bg: rgba(0, 0, 0, 0.1);
+    }
+
+    body.dark {
+      --background: #1e1e1e;
+      --text: #f0f0f0;
+      --widget-bg: #2e2e2e;
+      --author-text: #ccc;
+      --button-text: #f0f0f0;
+      --button-hover-bg: rgba(255, 255, 255, 0.1);
+      --button-active-bg: rgba(255, 255, 255, 0.2);
+    }
+
+    /* Estilos generales */
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Lato', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: var(--background);
+      color: var(--text);
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    /* Actualizar estilos del widget y botones */
+    .widget {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px; /* Aumentar padding para los botones */
+      background-color: var(--widget-bg);
+      transition: background-color 0.3s, color 0.3s;
+      width: 100%;
+      height: 100%;
+      box-sizing: border-box;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .quote {
+      font-size: 30px;
+      text-align: center;
+      margin-bottom: 3px; /* Reducido de 5px a 3px */
+      padding: 5px;
+      flex-grow: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .author {
+      font-size: 13px;
+      color: var(--author-text);
+      text-align: center;
+      margin-bottom: 10px; /* Reducido de 20px a 10px */
+    }
+
+    /* Botón de Modo Claro/Oscuro */
+    .mode-toggle-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: var(--button-bg);
+      border: none;
+      color: var(--button-text);
+      font-size: 1.2em;
+      cursor: pointer;
+      padding: 5px;
+      border-radius: 50%;
+      transition: background-color 0.3s;
+    }
+
+    .mode-toggle-btn:hover {
+      background-color: var(--button-hover-bg);
+    }
+
+    .mode-toggle-btn:active {
+      background-color: var(--button-active-bg);
+    }
+
+    /* Botón para Nueva Frase */
+    .new-quote-btn {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      background: var(--button-bg);
+      border: none;
+      color: var(--button-text);
+      font-size: 1.2em;
+      cursor: pointer;
+      padding: 5px;
+      border-radius: 50%;
+      transition: background-color 0.3s;
+    }
+
+    .new-quote-btn:hover {
+      background-color: var(--button-hover-bg);
+    }
+
+    .new-quote-btn:active {
+      background-color: var(--button-active-bg);
+    }
+
+    /* Responsividad */
+    @media (max-width: 400px) {
+      .widget {
+        padding: 15px;
+      }
+
+      .mode-toggle-btn,
+      .new-quote-btn {
+        font-size: 1em;
+        padding: 4px;
+      }
+    }
+
+    /* Estilos para los iconos SVG */
+    .icon-button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 8px;
+      transition: transform 0.3s ease;
+    }
+    
+    .icon-button:hover {
+      transform: scale(1.1);
+    }
+    
+    .icon-button svg {
+      width: 24px;
+      height: 24px;
+      fill: var(--text);
+      transition: fill 0.3s ease;
+    }
+
+    /* Posicionamiento de botones */
+    #modeToggleBtn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      z-index: 10;
+    }
+
+    #newQuoteBtn {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      z-index: 10;
+    }
+
+    /* Ajustes responsive */
+    @media (max-width: 768px) or (max-height: 600px) {
+      .widget {
+        padding: 30px 15px;
+      }
+
+      #modeToggleBtn {
+        top: 10px;
+        right: 10px;
+      }
+
+      #newQuoteBtn {
+        bottom: 10px;
+        left: 10px;
+      }
+
+      .icon-button {
+        padding: 6px;
+      }
+
+      .icon-button svg {
+        width: 20px;
+        height: 20px;
+      }
+    }
+
+    /* Ajustes para pantallas muy pequeñas */
+    @media (max-width: 480px) or (max-height: 480px) {
+      .widget {
+        padding: 25px 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="widget">
+    <button id="modeToggleBtn" class="icon-button">
+      <svg class="light-icon" viewBox="0 0 24 24">
+        <path d="M12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.65 0-3 1.35-3 3s1.35 3 3 3 3-1.35 3-3-1.35-3-3-3zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm20 0h-2c-.55 0-1-.45-1-1s.45-1 1-1h2c.55 0 1 .45 1 1s-.45 1-1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v-2c0-.55-.45-1-1-1s-1 .45-1 1v2c0 .55.45 1 1 1s1-.45 1-1z"/>
+      </svg>
+      <svg class="dark-icon" viewBox="0 0 24 24" style="display: none;">
+        <path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9c0-.46-.04-.92-.1-1.36-.98 1.37-2.58 2.26-4.4 2.26-3.03 0-5.5-2.47-5.5-5.5 0-1.82.89-3.42 2.26-4.4-.44-.06-.9-.1-1.36-.1z"/>
+      </svg>
+    </button>
+    <div class="quote">"Aquí aparecerá la frase del día."</div>
+    <div class="author">- Autor</div>
+    <button id="newQuoteBtn" class="icon-button">
+      <svg viewBox="0 0 24 24">
+        <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
+      </svg>
+    </button>
+  </div>
+  
+  <script>
+    // Lista de frases y autores
+    const quotes = [
+      { quote: "La vida es aquello que te sucede mientras estás ocupado haciendo otros planes.", author: "John Lennon" },
+      { quote: "El único modo de hacer un gran trabajo es amar lo que haces.", author: "Steve Jobs" },
+      { quote: "La imaginación es más importante que el conocimiento.", author: "Albert Einstein" },
+      { quote: "No cuentes los días, haz que los días cuenten.", author: "Muhammad Ali" },
+      { quote: "El futuro pertenece a quienes creen en la belleza de sus sueños.", author: "Eleanor Roosevelt" },
+      { quote: "La mejor manera de predecir el futuro es creándolo.", author: "Peter Drucker" },
+      { quote: "Sé el cambio que quieres ver en el mundo.", author: "Mahatma Gandhi" },
+      { quote: "El éxito no es la clave de la felicidad. La felicidad es la clave del éxito.", author: "Albert Schweitzer" },
+      { quote: "No encuentras la felicidad, la creas.", author: "Camilla Eyring Kimball" },
+      { quote: "Tu frase aquí.", author: "Autor" },
+      { quote: "Menos es más.", author: "Ludwig Mies van der Rohe" },
+    { quote: "La perfección se alcanza, no cuando no hay nada más que añadir, sino cuando no hay nada más que quitar.", author: "Antoine de Saint-Exupéry" },
+    { quote: "Simplicidad es la máxima sofisticación.", author: "Leonardo da Vinci" },
+    { quote: "Deshazte de todo lo que no te de alegría.", author: "Marie Kondo" },
+    { quote: "La vida es realmente simple, pero insistimos en hacerla complicada.", author: "Confucio" },
+    { quote: "El minimalismo no se trata de tener menos, se trata de hacer espacio para más de lo que importa.", author: "Joshua Becker" },
+    { quote: "La clave no es priorizar lo que está en tu agenda, sino agendar tus prioridades.", author: "Stephen Covey" },
+    { quote: "La libertad se alcanza no teniendo cosas, sino no necesitándolas.", author: "Epicteto" },
+    { quote: "El secreto de la felicidad, no es tener lo que quieres, sino querer lo que tienes.", author: "Rabbi Hyman Schachtel" },
+    { quote: "Vive simplemente para que otros puedan simplemente vivir.", author: "Mahatma Gandhi" },
+    { quote: "La belleza perece en la vida, pero es inmortal en el arte.", author: "Leonardo da Vinci" },
+    { quote: "Todo lo bello es moralmente bueno.", author: "Arthur Schopenhauer" },
+    { quote: "La belleza está en los ojos del que mira.", author: "Proverbio" },
+    { quote: "La belleza es poder; una sonrisa es su espada.", author: "Charles Reade" },
+    { quote: "La belleza no está en la cara; la belleza es una luz en el corazón.", author: "Khalil Gibran" },
+    { quote: "La belleza del mundo natural está en los detalles.", author: "Natalie Angier" },
+    { quote: "La belleza es la verdad, la verdad belleza,—eso es todo / Ye know on earth, and all ye need to know.", author: "John Keats" },
+    { quote: "La simplicidad es la clave de la verdadera elegancia.", author: "Coco Chanel" },
+    { quote: "La belleza es una forma de genio.", author: "Oscar Wilde" },
+    { quote: "Hay una belleza en la simplicidad y hay una belleza en la complejidad.", author: "Frank Gehry" },
+    { quote: "La creatividad es la inteligencia divirtiéndose.", author: "Albert Einstein" },
+    { quote: "La imaginación es más importante que el conocimiento.", author: "Albert Einstein" },
+    { quote: "La creatividad es permitirse cometer errores. El arte es saber cuáles conservar.", author: "Scott Adams" },
+    { quote: "La curiosidad mata al gato, pero la satisfacción lo trae de vuelta.", author: "Eugene O'Neill" },
+    { quote: "La inspiración existe, pero tiene que encontrarte trabajando.", author: "Pablo Picasso" },
+    { quote: "No tengas miedo a la perfección, nunca la alcanzarás.", author: "Salvador Dalí" },
+    { quote: "La creatividad requiere el coraje de dejar ir las certezas.", author: "Erich Fromm" },
+    { quote: "El principal enemigo de la creatividad es el buen gusto.", author: "Pablo Picasso" },
+    { quote: "Lo que separan a los innovadores de los seguidores no es la capacidad, sino el coraje.", author: "Amelia Earhart" },
+    { quote: "La lógica te llevará de la A a la B. La imaginación te llevará a cualquier parte.", author: "Albert Einstein" },
+    { quote: "La felicidad no es algo hecho. Viene de tus propias acciones.", author: "Dalai Lama" },
+    { quote: "Si quieres hacer las paces con tu enemigo, tienes que trabajar con tu enemigo. Entonces se convierte en tu compañero.", author: "Nelson Mandela" },
+    { quote: "La mayor parte de la belleza del mundo ha surgido del sufrimiento.", author: "Rabindranath Tagore" },
+    { quote: "Donde hay unidad hay siempre victoria.", author: "Publilio Siro" },
+    { quote: "La música es el mediador entre la vida espiritual y la vida de los sentidos.", author: "Ludwig van Beethoven" },
+    { quote: "El arte es la expresión del alma que busca la armonía del mundo.", author: "Wassily Kandinsky" },
+    { quote: "La paz viene de dentro. No la busques fuera.", author: "Buda" },
+    { quote: "El que conoce a otros es sabio; el que se conoce a sí mismo es iluminado.", author: "Lao-tsé" },
+    { quote: "La armonía no es la ausencia de conflicto, sino la capacidad para resolverlo pacíficamente.", author: "Margaret Mead" },
+    { quote: "Si hay luz en el alma, habrá belleza en la persona. Si hay belleza en la persona, habrá armonía en la casa. Si hay armonía en la casa, habrá orden en la nación. Si hay orden en la nación, habrá paz en el mundo.", author: "Proverbio Chino" },
+    { quote: "No busques la felicidad. Si la buscas, no la encontrarás, porque la búsqueda es lo contrario a la felicidad.", author: "Eckhart Tolle" },
+    { quote: "El zen es meditación. La meditación es el descubrimiento de la propia naturaleza.", author: "D.T. Suzuki" },
+    { quote: "Salta y la red aparecerá.", author: "John Burroughs" },
+    { quote: "El secreto de la salud, tanto para la mente como para el cuerpo, es no lamentarse del pasado, ni preocuparse por el futuro, sino vivir el momento presente sabia y seriamente.", author: "Buda" },
+    { quote: "El camino no es un camino, es un camino sin camino.", author: "Bruce Lee" },
+    { quote: "Haz lo que debes hacer y luego lo que quieras hacer.", author: "Confucio" },
+    { quote: "La paciencia es no sólo la capacidad de esperar, sino cómo te comportas mientras esperas.", author: "Joyce Meyer" },
+    { quote: "No pienses, mira.", author: "Shunryu Suzuki" },
+    { quote: "El obstáculo es el camino.", author: "Zen Koan" },
+    { quote: "La mente es como un paracaídas, no funciona si no está abierta.", author: "Frank Zappa" },
+    { quote: "El mayor riesgo es no correr ningún riesgo... En un mundo que cambia realmente rápido, la única estrategia que está garantizada a fracasar es no correr riesgos.", author: "Mark Zuckerberg" },
+    { quote: "Tu tiempo es limitado, así que no lo desperdicies viviendo la vida de otra persona.", author: "Steve Jobs" },
+    { quote: "La mejor manera de predecir el futuro es crearlo.", author: "Peter Drucker" },
+    { quote: "El éxito no es definitivo, el fracaso no es fatal: lo que cuenta es el coraje para continuar.", author: "Winston Churchill" },
+    { quote: "Siempre entrega más de lo que se espera de ti.", author: "Larry Page" },
+    { quote: "La innovación distingue entre un líder y un seguidor.", author: "Steve Jobs" },
+    { quote: "El camino hacia el éxito y el camino hacia el fracaso son casi exactamente el mismo.", author: "Colin R. Davis" },
+    { quote: "No se trata de ideas. Se trata de hacer que las ideas sucedan.", author: "Scott Belsky" },
+    { quote: "Construye tus propios sueños, o alguien más te contratará para construir los suyos.", author: "Farraj Gray" },
+    { quote: "El éxito es la suma de pequeños esfuerzos, repetidos día tras día.", author: "Robert Collier" },
+    { quote: "No tengas miedo de renunciar a lo bueno para ir por lo grandioso.", author: "John D. Rockefeller" },
+    { quote: "La única forma de hacer un gran trabajo es amar lo que haces.", author: "Steve Jobs" },
+    { quote: "No he fallado. Sólo he encontrado 10.000 maneras que no funcionan.", author: "Thomas Edison" },
+    { quote: "El precio del éxito es trabajo duro, dedicación al trabajo que tenemos entre manos y la determinación de que, ganemos o perdamos, hemos aplicado lo mejor de nosotros mismos a la tarea que tenemos entre manos.", author: "Vince Lombardi" },
+    { quote: "El ingrediente más importante es levantarte y hacer algo. Así es como las cosas suceden. Así es como el éxito sucede.", author: "Conor McGregor" },
+    { quote: "Las oportunidades de negocio son como los autobuses, siempre hay otro que viene.", author: "Richard Branson" },
+    { quote: "La calidad nunca es un accidente. Siempre es el resultado de un esfuerzo inteligente.", author: "John Ruskin" },
+    { quote: "Cuando dejas de soñar dejas de vivir.", author: "Malcolm Forbes" },
+    { quote: "No puedes construir una reputación en lo que vas a hacer.", author: "Henry Ford" },
+    { quote: "Los grandes logros siempre se construyen sobre el sacrificio y nunca se logran con deseos egoístas.", author: "Napoleon Hill" },
+    { quote: "La creatividad es restar.", author: "Austin Kleon" },
+    { quote: "Menos es más, excepto cuando se trata de felicidad.", author: "Stephen Fry" },
+    { quote: "La belleza en las cosas existe en la mente que las contempla.", author: "David Hume" },
+    { quote: "La vida es un equilibrio entre descansar y hacer.", author: "Sadhguru" },
+    { quote: "El éxito no es la clave de la felicidad. La felicidad es la clave del éxito. Si amas lo que haces, tendrás éxito.", author: "Albert Schweitzer" },
+    { quote: "La innovación distingue entre un líder y un seguidor.", author: "Steve Jobs" },
+    { quote: "La mejor manera de predecir el futuro es crearlo.", author: "Abraham Lincoln/Peter Drucker" },
+    { quote: "La felicidad es una mariposa que, cuando la persigues, siempre está más allá de tu alcance, pero que, si te sientas tranquilamente, puede posarse sobre ti.", author: "Nathaniel Hawthorne" },
+    { quote: "Vive como si fueras a morir mañana. Aprende como si fueras a vivir para siempre.", author: "Mahatma Gandhi" },
+    { quote: "Sé el cambio que quieres ver en el mundo.", author: "Mahatma Gandhi" },
+    { quote: "La vida es lo que te pasa mientras estás ocupado haciendo otros planes.", author: "John Lennon" },
+    { quote: "Lo único que tenemos que temer es al propio temor.", author: "Franklin D. Roosevelt" },
+    { quote: "La vida es una serie de lecciones que deben ser vividas para ser entendidas.", author: "Ralph Waldo Emerson" },
+    { quote: "La mejor venganza es el éxito masivo.", author: "Frank Sinatra" },
+    { quote: "No juzgues cada día por la cosecha que recoges, sino por las semillas que plantas.", author: "Robert Louis Stevenson" },
+    { quote: "La mayor gloria en vivir no reside en nunca caer, sino en levantarnos cada vez que caemos.", author: "Nelson Mandela" },
+    { quote: "Lo que no te mata, te hace más fuerte.", author: "Friedrich Nietzsche" },
+    { quote: "El futuro pertenece a quienes creen en la belleza de sus sueños.", author: "Eleanor Roosevelt" },
+    { quote: "La vida es muy importante como para tomársela en serio.", author: "Oscar Wilde" },
+    { quote: "La mente es todo. En lo que piensas te conviertes.", author: "Buda" },
+    { quote: "La acción es la clave fundamental para todo éxito.", author: "Pablo Picasso" },
+    { quote: "La felicidad no es una meta, es un estilo de vida.", author: "Eleanor Roosevelt" },
+    { quote: "El mejor momento para plantar un árbol fue hace 20 años. El segundo mejor momento es hoy.", author: "Proverbio chino" },
+    { quote: "La vida es una aventura audaz o nada en absoluto.", author: "Helen Keller" }
+    ];
+
+    let lastQuoteIndex = -1;
+
+    // Función para obtener una frase aleatoria sin repetir la última
+    function getRandomQuote() {
+      if (quotes.length === 0) return { quote: "", author: "" };
+      let index;
+      do {
+        index = Math.floor(Math.random() * quotes.length);
+      } while (index === lastQuoteIndex && quotes.length > 1);
+      lastQuoteIndex = index;
+      return quotes[index];
+    }
+
+    // Función para mostrar una frase
+    function displayQuote(quoteObj) {
+      const quoteElement = document.querySelector('.quote');
+      const authorElement = document.querySelector('.author');
+      quoteElement.textContent = `"${quoteObj.quote}"`;
+      authorElement.textContent = `- ${quoteObj.author}`;
+    }
+
+    // Mostrar una frase al cargar la página
+    window.onload = () => {
+      const initialQuote = getRandomQuote();
+      displayQuote(initialQuote);
+    };
+
+    // Manejar el modo claro/oscuro
+    const modeToggleBtn = document.getElementById('modeToggleBtn');
+    const lightIcon = modeToggleBtn.querySelector('.light-icon');
+    const darkIcon = modeToggleBtn.querySelector('.dark-icon');
+
+    function updateModeIcons(isDark) {
+      lightIcon.style.display = isDark ? 'none' : 'block';
+      darkIcon.style.display = isDark ? 'block' : 'none';
+    }
+
+    modeToggleBtn.addEventListener('click', () => {
+      const isDark = document.body.classList.toggle('dark');
+      localStorage.setItem('mode', isDark ? 'dark' : 'light');
+      updateModeIcons(isDark);
+    });
+
+    // Inicializar el estado del icono
+    const currentMode = localStorage.getItem('mode') || 'light';
+    updateModeIcons(currentMode === 'dark');
+
+    // Manejar el botón de nueva frase
+    const newQuoteBtn = document.getElementById('newQuoteBtn');
+    newQuoteBtn.addEventListener('click', () => {
+      const newQuote = getRandomQuote();
+      displayQuote(newQuote);
+    });
+  </script>
+</body>
+</html>
