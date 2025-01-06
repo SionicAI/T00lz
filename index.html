@@ -69,6 +69,7 @@
         .dopamine-task:hover { text-shadow: 0 0 10px #ff00ff; border-color: #ff00ff; box-shadow: 0 0 20px rgba(255, 0, 255, 0.5); }
         .mutxt:hover { text-shadow: 0 0 10px #00ff00; border-color: #00ff00; box-shadow: 0 0 20px rgba(0, 255, 0, 0.5); }
         .calculadora:hover { text-shadow: 0 0 10px #ff0000; border-color: #ff0000; box-shadow: 0 0 20px rgba(255, 0, 0, 0.5); }
+        .MuTracker:hover { text-shadow: 0 0 10px #ff0000; border-color: #ff0000; box-shadow: 0 0 20px rgba(255, 0, 0, 0.5); }
         
         @media (max-width: 768px) {
             h1 { font-size: 2rem; }
@@ -84,6 +85,7 @@
             <button class="button dopamine-task">Lista de tareas (Dopamine Task)</button>
             <button class="button mutxt">Editor de texto (MuTXT)</button>
             <button class="button calculadora">Calculadora</button>
+            <button class="button Tracker">Habit Tracker</button>
         </div>
     </div>
 
@@ -179,6 +181,10 @@
 
         document.querySelector('.calculadora').addEventListener('click', () => {
             window.location.href = 'Compilado.html';
+        });
+
+        document.querySelector('.MuTracker').addEventListener('click', () => {
+            window.location.href = 'Mutracker.html';
         });
     </script>
 </body>
