@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chatbot con Langflow</title>
+  <style>
+    /* Estilos básicos para el chatbot */
+    #chatbot-container {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 300px;
+      height: 400px;
+      border: 1px solid #ccc;
+      background-color: #f9f9f9;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      display: flex;
+      flex-direction: column;
+    }
+    #chatbot-messages {
+      flex: 1;
+      padding: 10px;
+      overflow-y: auto;
+    }
+    #chatbot-input {
+      display: flex;
+      border-top: 1px solid #ccc;
+    }
+    #chatbot-input input {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      outline: none;
+    }
+    #chatbot-input button {
+      padding: 10px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>Bienvenido a mi página web</h1>
+  <p>Este es un ejemplo de un chatbot integrado con Langflow.</p>
+
+  <!-- Contenedor del chatbot -->
+  <div id="chatbot-container">
+    <div id="chatbot-messages"></div>
+    <div id="chatbot-input">
+      <input type="text" id="user-input" placeholder="Escribe tu mensaje...">
+      <button onclick="sendMessage()">Enviar</button>
+    </div>
+  </div>
+
+  <script>
+    // Clase LangflowClient (proporcionada por ti)
+    class LangflowClient {
+      constructor(baseURL, applicationToken) {
+        this.baseURL = baseURL;
+        this.applicationToken = applicationToken;
+      }
+
+      async post(endpoint, body, headers = { "Content-Type": "application/json" }) {
+        headers["Authorization"] = `Bearer ${this.applicationToken}`;
+        headers["Content-Type"] = "application/json";
+        const url = `${this.baseURL}${endpoint}`;
+        try {
+          const response = await fetch(url, {
+            method: 'POST',
+            headers: headers,
+            body: JSON.stringify(body)
+          });
+
+          const responseMessage = await response.json();
+          if (!response.ok) {
+            throw new Error(`${response.status} ${response.statusText} - ${JSON.stringify(responseMessage)}`);
+          }
+          return responseMessage;
+        } catch (error) {
+          console.error('Request Error:', error.message);
+          throw error;
+        }
+      }
+
+      async initiateSession(flowId, langflowId, inputValue, inputType = 'chat', outputType = 'chat', stream = false, tweaks = {}) {
+        const endpoint = `/lf/${langflowId}/api/v1/run/${flowId}?stream=${stream}`;
+        return this.post(endpoint, { input_value: inputValue, input_type: inputType, output_type: outputType, tweaks: tweaks });
+      }
+
+      handleStream(streamUrl, onUpdate, onClose, onError) {
+        const eventSource = new EventSource(streamUrl);
+
+        eventSource.onmessage = event => {
+          const data = JSON.parse(event.data);
+          onUpdate(data);
+        };
+
+        eventSource.onerror = event => {
+          console.error('Stream Error:', event);
+          onError(event);
+          eventSource.close();
+        };
+
+        eventSource.addEventListener("close", () => {
+          onClose('Stream closed');
+          eventSource.close();
+        });
+
+        return eventSource;
+      }
+
+      async runFlow(flowIdOrName, langflowId, inputValue, inputType = 'chat', outputType = 'chat', tweaks = {}, stream = false, onUpdate, onClose, onError) {
+        try {
+          const initResponse = await this.initiateSession(flowIdOrName, langflowId, inputValue, inputType, outputType, stream, tweaks);
+          console.log('Init Response:', initResponse);
+          if (stream && initResponse && initResponse.outputs && initResponse.outputs[0].outputs[0].artifacts.stream_url) {
+            const streamUrl = initResponse.outputs[0].outputs[0].artifacts.stream_url;
+            console.log(`Streaming from: ${streamUrl}`);
+            this.handleStream(streamUrl, onUpdate, onClose, onError);
+          }
+          return initResponse;
+        } catch (error) {
+          console.error('Error running flow:', error);
+          onError('Error initiating session');
+        }
+      }
+    }
+
+    // Variables globales
+    const messagesDiv = document.getElementById('chatbot-messages');
+    const userInput = document.getElementById('user-input');
+
+    // Configuración de Langflow
+    const flowIdOrName = '6e32895f-18ac-431b-92c6-5079129aa8bf'; // Reemplaza con tu Flow ID
+    const langflowId = 'b3fa4f65-20d2-4475-96c1-078d87f0ffb0'; // Reemplaza con tu Langflow ID
+    const applicationToken = 'AstraCS:ZwLWWdZoBofPKOZwFPylWgLI:52e4bca4cf071a686608b7bf3727c594599a337d6e169ebf28cca52a634ca47d'; // Reemplaza con tu Application Token
+    const langflowClient = new LangflowClient('https://api.langflow.astra.datastax.com', applicationToken);
+
+    // Función para enviar mensajes
+    async function sendMessage() {
+      const message = userInput.value.trim();
+      if (message === '') return;
+
+      // Agrega el mensaje del usuario al chat
+      messagesDiv.innerHTML += `<div><strong>Tú:</strong> ${message}</div>`;
+
+      // Envía el mensaje a Langflow
+      try {
+        const tweaks = {
+          "Agent-jnP0J": {},
+          "ChatInput-hu4vG": {},
+          "ChatOutput-aEIar": {},
+          "URL-nTKT9": {},
+          "CalculatorTool-UGqm2": {}
+        };
+
+        const response = await langflowClient.runFlow(
+          flowIdOrName,
+          langflowId,
+          message,
+          'chat',
+          'chat',
+          tweaks,
+          false,
+          (data) => console.log("Received:", data.chunk), // onUpdate
+          (message) => console.log("Stream Closed:", message), // onClose
+          (error) => console.log("Stream Error:", error) // onError
+        );
+
+        if (response && response.outputs) {
+          const flowOutputs = response.outputs[0];
+          const firstComponentOutputs = flowOutputs.outputs[0];
+          const output = firstComponentOutputs.outputs.message;
+
+          // Agrega la respuesta del bot al chat
+          messagesDiv.innerHTML += `<div><strong>Bot:</strong> ${output.text}</div>`;
+        }
+      } catch (error) {
+        console.error('Error:', error.message);
+        messagesDiv.innerHTML += `<div><strong>Bot:</strong> Lo siento, hubo un error. Inténtalo de nuevo.</div>`;
+      }
+
+      // Limpia el campo de entrada
+      userInput.value = '';
+    }
+  </script>
+</body>
+</html>
