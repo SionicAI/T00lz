@@ -5,16 +5,86 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chat con n8n</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@n8n/chat/dist/style.css" rel="stylesheet" />
     <style>
         :root {
-            --bg-color: #f4f4f4;
+            /* Light Theme */
+            --bg-color: #ffffff;
             --text-color: #1a1a1a;
-            --input-bg: #ffffff;
-            --border-color: #ddd;
-            --accent-color: #007bff;
+            --input-bg: #f8f9fa;
+            --border-color: #e9ecef;
+            --accent-color: #6366f1;
             --error-color: #dc2626;
-            --bot-bg: #eee;
+            --bot-bg: #f1f5f9;
+            --toggle-bg: #e2e8f0;
+            --toggle-icon: #1a1a1a;
+            
+            --chat--color-primary: #4A5568;
+            --chat--color-primary-shade-50: #2D3748;
+            --chat--color-primary-shade-100: #1A202C;
+            --chat--color-secondary: #718096;
+            --chat--color-secondary-shade-50: #4A5568;
+            --chat--color-white: #ffffff;
+            --chat--color-light: #F7FAFC;
+            --chat--color-light-shade-50: #EDF2F7;
+            --chat--color-light-shade-100: #E2E8F0;
+            --chat--color-medium: #A0AEC0;
+            --chat--color-dark: #2D3748;
+            --chat--color-disabled: #718096;
+            --chat--color-typing: #4A5568;
+
+            --chat--spacing: 1rem;
+            --chat--border-radius: 0.25rem;
+            --chat--transition-duration: 0.15s;
+
+            --chat--window--width: 400px;
+            --chat--window--height: 600px;
+
+            --chat--header-height: Auto-resize;
+            --chat--header--padding: 0.25rem;
+            --chat--header--background: #F0F0F0;
+            --chat--header--color: var(--chat--color-light);
+            --chat--header--border-top: none;
+            --chat--header--border-bottom: 1px solid var(--border-color);
+            --chat--header--border-bottom: none;
+            --chat--header--border-bottom: none;
+            --chat--heading--font-size: 2em;
+            --chat--header--color: #F31D5B;
+            --chat--subtitle--font-size: 1.2em;
+            --chat--subtitle--line-height: 1.8;
+
+            --chat--textarea--height: 50px;
+
+            --chat--message--font-size: 1rem;
+            --chat--message--padding: var(--chat--spacing);
+            --chat--message--border-radius: var(--chat--border-radius);
+            --chat--message-line-height: 1.8;
+            --chat--message--bot--background: var(--chat--color-white);
+            --chat--message--bot--color: var(--chat--color-dark);
+            --chat--message--bot--border: none;
+            --chat--message--user--background: var(--chat--color-secondary);
+            --chat--message--user--color: var(--chat--color-white);
+            --chat--message--user--border: none;
+            --chat--message--pre--background: rgba(0, 0, 0, 0.05);
+
+            --chat--toggle--background: var(--chat--color-primary);
+            --chat--toggle--hover--background: var(--chat--color-primary-shade-50);
+            --chat--toggle--active--background: var(--chat--color-primary-shade-100);
+            --chat--toggle--color: var(--chat--color-white);
+            --chat--toggle--size: 64px;
+
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #0f172a;
+            --text-color: #f8fafc;
+            --input-bg: #1e293b;
+            --border-color: #334155;
+            --accent-color: #818cf8;
+            --error-color: #ef4444;
+            --bot-bg: #1e293b;
+            --toggle-bg: #334155;
+            --toggle-icon: #f8fafc;
         }
 
         body {
@@ -139,88 +209,131 @@
             opacity: 0.5;
             cursor: not-allowed;
         }
+        .chat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+            padding: 0.5rem 0;
+        }
+
+        .chat-header h2 {
+            color: #F31D5B;
+            font-size: 1.5rem;
+            font-weight: 500;
+            margin: 0;
+        }
+        margin-bottom: 1rem;
+        }
+
+        .theme-toggle {
+            background: var(--toggle-bg);
+            border: none;
+            color: var(--toggle-icon);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s;
+        }
+
+        .theme-toggle:hover {
+            opacity: 0.9;
+        }
+
+        .theme-toggle svg {
+            width: 20px;
+            height: 20px;
+            transition: transform 0.3s;
+        }
+
+        .sun-icon {
+            display: none;
+        }
+
+        .moon-icon {
+            display: block;
+        }
+
+        [data-theme="dark"] .sun-icon {
+            display: block;
+        }
+
+        [data-theme="dark"] .moon-icon {
+            display: none;
+        }
     </style>
 </head>
 <body>
-
     <div id="chat-container">
-        <h2>Chat con n8n</h2>
-        <div id="chat-box"></div>
-        <div id="input-box">
-            <input type="text" id="user-input" placeholder="Escribe un mensaje...">
-            <button onclick="sendMessage()">Enviar</button>
+        <div class="chat-header">
+            <h2>Chat con n8n</h2>
+            <button id="theme-toggle" class="theme-toggle">
+                <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="5"/>
+                    <line x1="12" y1="1" x2="12" y2="3"/>
+                    <line x1="12" y1="21" x2="12" y2="23"/>
+                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                    <line x1="1" y1="12" x2="3" y2="12"/>
+                    <line x1="21" y1="12" x2="23" y2="12"/>
+                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                </svg>
+                <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                </svg>
+            </button>
         </div>
     </div>
 
-    <script>
-        const inputField = document.getElementById("user-input");
-        const sendButton = document.querySelector("button");
+    <script type="module">
+        import { createChat } from 'https://cdn.jsdelivr.net/npm/@n8n/chat/dist/chat.bundle.es.js';
 
-        // Event listeners
-        inputField.addEventListener("keypress", (e) => {
-            if (e.key === "Enter" && !e.shiftKey) {
-                e.preventDefault();
-                sendMessage();
-            }
+        createChat({
+	webhookUrl: 'https://n8n.simplici.xyz/webhook/e985d15f-b2f6-456d-be15-97e0b1544a40/chat',
+	webhookConfig: {
+		method: 'POST',
+		headers: {}
+	},
+	target: '#n8n-chat',
+	mode: 'window',
+	chatInputKey: 'chatInput',
+	chatSessionKey: 'sessionId',
+	metadata: {},
+	showWelcomeScreen: false,
+	defaultLanguage: 'es',
+	initialMessages: [
+		'¡Hola! 👋 Soy Sioni, asistente de ventas de Sionica. ¿Cómo te llamas? ',
+	],
+	i18n: {
+		es: {
+			title: "Sionica|Agencia",
+			subtitle: '',
+			footer: '',
+			getStarted: 'New Conversation',
+			inputPlaceholder: 'Type your question..',
+		},
+	},
+});
+
+       
+
+        // Theme toggle functionality
+        const themeToggle = document.getElementById('theme-toggle');
+        const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+
+        // Set initial theme
+        document.documentElement.setAttribute('data-theme', prefersDarkScheme.matches ? 'dark' : 'light');
+
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
         });
-
-        inputField.addEventListener("input", () => {
-            sendButton.disabled = inputField.value.trim() === "";
-        });
-
-        async function sendMessage() {
-            const chatBox = document.getElementById("chat-box");
-            const messageText = inputField.value.trim();
-
-            if (messageText === "") return;
-
-            // Disable input and button while sending
-            inputField.disabled = true;
-            sendButton.disabled = true;
-
-            // Add user message
-            const userMessage = document.createElement("div");
-            userMessage.classList.add("message", "user");
-            userMessage.textContent = messageText;
-            chatBox.appendChild(userMessage);
-            chatBox.scrollTop = chatBox.scrollHeight;
-
-            inputField.value = "";
-
-            try {
-                const response = await fetch("https://n8n.simplici.xyz/webhook/e985d15f-b2f6-456d-be15-97e0b1544a40/chat", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ message: messageText })
-                });
-
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-
-                const responseData = await response.json();
-
-                // Add bot message with Markdown rendering
-                const botMessage = document.createElement("div");
-                botMessage.classList.add("message", "bot");
-                botMessage.innerHTML = marked.parse(responseData.response || "No se recibió respuesta.");
-                chatBox.appendChild(botMessage);
-
-            } catch (error) {
-                console.error("Error al enviar el mensaje:", error);
-                const errorMessage = document.createElement("div");
-                errorMessage.classList.add("error");
-                errorMessage.textContent = "Error al conectarse con el servidor. Por favor, inténtalo de nuevo.";
-                chatBox.appendChild(errorMessage);
-            } finally {
-                // Re-enable input and button
-                inputField.disabled = false;
-                sendButton.disabled = false;
-                inputField.focus();
-                chatBox.scrollTop = chatBox.scrollHeight;
-            }
-        }
     </script>
-
 </body>
 </html>
