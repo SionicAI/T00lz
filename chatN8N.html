@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat con n8n</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        :root {
+            --bg-color: #f4f4f4;
+            --text-color: #1a1a1a;
+            --input-bg: #ffffff;
+            --border-color: #ddd;
+            --accent-color: #007bff;
+            --error-color: #dc2626;
+            --bot-bg: #eee;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+        }
+        #chat-container {
+            width: 90%;
+            max-width: 800px;
+            background: var(--input-bg);
+            padding: 1.5rem;
+            border-radius: 1rem;
+            box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            height: 90vh;
+        }
+        #chat-box {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            background: var(--input-bg);
+            margin-bottom: 1rem;
+        }
+        .message {
+            padding: 1rem;
+            border-radius: 0.75rem;
+            margin: 0.5rem 0;
+            max-width: 85%;
+            line-height: 1.5;
+            font-size: 0.95rem;
+        }
+
+        .user {
+            background: var(--accent-color);
+            color: white;
+            align-self: flex-end;
+        }
+
+        .bot {
+            background: var(--bot-bg);
+            color: var(--text-color);
+            align-self: flex-start;
+        }
+
+        .bot pre {
+            background: rgba(0, 0, 0, 0.05);
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin: 0.5rem 0;
+        }
+
+        .bot code {
+            font-family: monospace;
+            background: rgba(0, 0, 0, 0.05);
+            padding: 0.2rem 0.4rem;
+            border-radius: 0.25rem;
+            font-size: 0.9em;
+        }
+
+        .error {
+            background: var(--error-color);
+            color: white;
+            align-self: center;
+            font-size: 0.9rem;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            margin: 0.5rem 0;
+            max-width: 90%;
+            text-align: center;
+        }
+        #input-box {
+            display: flex;
+            gap: 0.75rem;
+            padding-top: 0.5rem;
+        }
+
+        input {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            border: 1.5px solid var(--border-color);
+            border-radius: 0.5rem;
+            font-size: 0.95rem;
+            font-family: inherit;
+            background: var(--input-bg);
+            color: var(--text-color);
+            transition: border-color 0.2s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+
+        button {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            background: var(--accent-color);
+            color: white;
+            cursor: pointer;
+            border-radius: 0.5rem;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: opacity 0.2s;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="chat-container">
+        <h2>Chat con n8n</h2>
+        <div id="chat-box"></div>
+        <div id="input-box">
+            <input type="text" id="user-input" placeholder="Escribe un mensaje...">
+            <button onclick="sendMessage()">Enviar</button>
+        </div>
+    </div>
+
+    <script>
+        const inputField = document.getElementById("user-input");
+        const sendButton = document.querySelector("button");
+
+        // Event listeners
+        inputField.addEventListener("keypress", (e) => {
+            if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+
+        inputField.addEventListener("input", () => {
+            sendButton.disabled = inputField.value.trim() === "";
+        });
+
+        async function sendMessage() {
+            const chatBox = document.getElementById("chat-box");
+            const messageText = inputField.value.trim();
+
+            if (messageText === "") return;
+
+            // Disable input and button while sending
+            inputField.disabled = true;
+            sendButton.disabled = true;
+
+            // Add user message
+            const userMessage = document.createElement("div");
+            userMessage.classList.add("message", "user");
+            userMessage.textContent = messageText;
+            chatBox.appendChild(userMessage);
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            inputField.value = "";
+
+            try {
+                const response = await fetch("https://n8n.simplici.xyz/webhook/e985d15f-b2f6-456d-be15-97e0b1544a40/chat", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ message: messageText })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const responseData = await response.json();
+
+                // Add bot message with Markdown rendering
+                const botMessage = document.createElement("div");
+                botMessage.classList.add("message", "bot");
+                botMessage.innerHTML = marked.parse(responseData.response || "No se recibió respuesta.");
+                chatBox.appendChild(botMessage);
+
+            } catch (error) {
+                console.error("Error al enviar el mensaje:", error);
+                const errorMessage = document.createElement("div");
+                errorMessage.classList.add("error");
+                errorMessage.textContent = "Error al conectarse con el servidor. Por favor, inténtalo de nuevo.";
+                chatBox.appendChild(errorMessage);
+            } finally {
+                // Re-enable input and button
+                inputField.disabled = false;
+                sendButton.disabled = false;
+                inputField.focus();
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }
+        }
+    </script>
+
+</body>
+</html>
