@@ -3,59 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sioni Asistente de ventas [BETA]</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
+    <title>Sionica Agent [Beta]</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/@n8n/chat/dist/style.css" rel="stylesheet" />
     <style>
         :root {
-            /* Light Theme */
+            --primary-color: #000000;
             --bg-color: #ffffff;
-            --text-color: #1a1a1a;
-            --input-bg: #f8f9fa;
-            --border-color: #e9ecef;
-            --accent-color: #6366f1;
-            --error-color: #dc2626;
-            --bot-bg: #f1f5f9;
-            --toggle-bg: #e2e8f0;
-            --toggle-icon: #1a1a1a;
+            --text-color: #000000;
+            --secondary-bg: #f0f0f0;
+            --border-color: #cccccc;
+            --message-user-bg: #000000;
+            --message-bot-bg: #f0f0f0;
+            --shadow-color: rgba(0, 0, 0, 0.05);
             
-            --chat--color-primary: #4A5568;
-            --chat--color-primary-shade-50: #2D3748;
-            --chat--color-primary-shade-100: #1A202C;
-            --chat--color-secondary: #718096;
-            --chat--color-secondary-shade-50: #4A5568;
+            --chat--color-primary: #F31D5B;
+            --chat--color-primary-shade-50: #d91951;
+            --chat--color-primary-shade-100: #c01646;
+            --chat--color-secondary: #1a1a1a;
+            --chat--color-secondary-shade-50: #2a2a2a;
             --chat--color-white: #ffffff;
-            --chat--color-light: #F7FAFC;
-            --chat--color-light-shade-50: #EDF2F7;
-            --chat--color-light-shade-100: #E2E8F0;
-            --chat--color-medium: #A0AEC0;
-            --chat--color-dark: #2D3748;
-            --chat--color-disabled: #718096;
-            --chat--color-typing: #4A5568;
+            --chat--color-light: #f5f5f5;
+            --chat--color-light-shade-50: #e0e0e0;
+            --chat--color-light-shade-100: #cccccc;
+            --chat--color-medium: #808080;
+            --chat--color-dark: #1a1a1a;
+            --chat--color-disabled: #cccccc;
+            --chat--color-typing: #808080;
 
-            --chat--spacing: 1rem;
-            --chat--border-radius: 0.25rem;
-            --chat--transition-duration: 0.15s;
+            --chat--spacing: 1.25rem;
+            --chat--border-radius: 0.5rem;
+            --chat--transition-duration: 0.2s;
 
-            --chat--window--width: 400px;
-            --chat--window--height: 600px;
+            --chat--window--width: 450px;
+            --chat--window--height: 700px;
 
-            --chat--header-height: Auto-resize;
-            --chat--header--padding: 0.25rem;
-            --chat--header--background: #F0F0F0;
-            --chat--header--color: var(--chat--color-light);
+            --chat--header-height: 60px;
+            --chat--header--padding: 1rem;
+            --chat--header--background: var(--chat--color-white);
+            --chat--header--color: var(--chat--color-primary);
             --chat--header--border-top: none;
-            --chat--header--border-bottom: 1px solid var(--border-color);
-            --chat--header--border-bottom: none;
-            --chat--header--border-bottom: none;
-            --chat--heading--font-size: 2em;
-            --chat--header--color: #F31D5B;
-            --chat--subtitle--font-size: 1.2em;
-            --chat--subtitle--line-height: 1.8;
+            --chat--header--border-bottom: 1px solid var(--chat--color-light-shade-50);
+            --chat--heading--font-size: 1.50rem;
+            --chat--subtitle--font-size: 0.875rem;
+            --chat--subtitle--line-height: 1.5;
 
             --chat--textarea--height: 50px;
 
-            --chat--message--font-size: 1rem;
+            --chat--message--font-size: 0.875rem;
             --chat--message--padding: var(--chat--spacing);
             --chat--message--border-radius: var(--chat--border-radius);
             --chat--message-line-height: 1.8;
@@ -76,27 +71,28 @@
         }
 
         [data-theme="dark"] {
-            --bg-color: #0f172a;
-            --text-color: #f8fafc;
-            --input-bg: #1e293b;
-            --border-color: #334155;
-            --accent-color: #818cf8;
-            --error-color: #ef4444;
-            --bot-bg: #1e293b;
-            --toggle-bg: #334155;
-            --toggle-icon: #f8fafc;
+            --bg-color: #121212;
+            --text-color: #e0e0e0;
+            --secondary-bg: #1e1e1e;
+            --border-color: #2d2d2d;
+            --message-user-bg: #404040;
+            --message-bot-bg: #1e1e1e;
+            --shadow-color: rgba(255, 255, 255, 0.05);
         }
 
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: 'DM Sans', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s;
+            line-height: 1.5;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100vh;
-            margin: 0;
-            background-color: var(--bg-color);
-            color: var(--text-color);
         }
         #chat-container {
             width: 90%;
@@ -120,7 +116,7 @@
         }
         .message {
             padding: 1rem;
-            border-radius: 0.75rem;
+            border-radius: 1.25rem;
             margin: 0.5rem 0;
             max-width: 85%;
             line-height: 1.5;
@@ -222,9 +218,10 @@
             font-size: 1.5rem;
             font-weight: 500;
             margin: 0;
+            margin-bottom: 1rem;
         }
-        margin-bottom: 1rem;
-        }
+    
+/* Remove stray margin-bottom declaration */
 
         .theme-toggle {
             background: var(--toggle-bg);
@@ -270,7 +267,7 @@
 <body>
     <div id="chat-container">
         <div class="chat-header">
-            <h2>Sioni Asistente de ventas [BETA]</h2>
+            <h2>Sionica Agent [Beta]</h2>
             <button id="theme-toggle" class="theme-toggle">
                 <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <circle cx="12" cy="12" r="5"/>
@@ -311,11 +308,11 @@
 	],
 	i18n: {
 		es: {
-			title: "Sionica|Agencia",
+			title: "Siónica|Agencia",
 			subtitle: '',
-			footer: '',
+			footer: 'Powered by Sionic.AI',
 			getStarted: 'New Conversation',
-			inputPlaceholder: '¡Hablemos!',
+			inputPlaceholder: '¡hablemos!',
 		},
 	},
 });
